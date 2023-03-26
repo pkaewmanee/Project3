@@ -99,9 +99,9 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         for (Enemy enemy : enemies) {
             enemy.update();
         }
-        /*for (Projectile projectile : projectiles) {
+        for (Projectile projectile : projectiles) {
             projectile.update();
-        }*/
+        }
     }
 
     @Override
@@ -111,9 +111,9 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         for (Enemy enemy : enemies) {
             enemy.draw(g);
         }
-        /*for (Projectile projectile : projectiles) {
+        for (Projectile projectile : projectiles) {
             projectile.draw(g);
-        }*/
+        }
     }
     
     @Override
@@ -132,6 +132,9 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
                 break;
             case KeyEvent.VK_DOWN:
                 player.moveDown();
+                break;
+            case KeyEvent.VK_Z:
+                player.shoot(projectiles);
                 break;
             default:
                 break;
@@ -214,6 +217,15 @@ class Player extends Object {
         }
         update();
     }
+    
+    public void shoot(java.util.List<Projectile> projectile){
+        int projectileWidth = 3;
+        int projectileHeight = 7;
+        int projectileSpeed = 10;
+        int projectileX = x + width / 2 - projectileWidth / 2;
+        int projectileY = y - projectileHeight;
+        projectile.add(new Projectile(projectileX,projectileY,projectileWidth,projectileHeight,projectileSpeed));
+    }
 
     @Override
     public void update() {
@@ -228,19 +240,49 @@ class Player extends Object {
 }
 
 class Enemy extends Object {
-    private int speed;
+    private int verticalspeed;
+    private int horizontalspeed;
+    private int updateCounter;
+    private int updatesBeforeDirectionChange;
 
     public Enemy(int x, int y, int width, int height) {
         super(x, y, width, height);
-        this.speed = 2;
+        this.verticalspeed = 1;
+        this.horizontalspeed = generateRandomHorizontalSpeed();
+        this.updateCounter = 0;
+        this.updatesBeforeDirectionChange = generateRandomUpdatesBeforeDirectionChange();
     }
-
+    
+    private int generateRandomHorizontalSpeed() {
+        return new Random().nextInt(5) - 2;
+    }
+    
+    private int generateRandomUpdatesBeforeDirectionChange() {
+        return new Random().nextInt(71) + 30;
+    }
+    
     @Override
     public void update() {
         // Update enemy's position, behavior, etc.
-        y += speed;
+        y += verticalspeed;
+        x += horizontalspeed;
+        
+        if (x < 0) {
+            x = 0;
+            horizontalspeed = -horizontalspeed;
+        } else if (x > GamePanel.getGameWidth() - width) {
+            x = GamePanel.getGameWidth() - width;
+            horizontalspeed = -horizontalspeed;
+        }
+        updateCounter++;
+        if (updateCounter >= updatesBeforeDirectionChange) {
+            horizontalspeed = generateRandomHorizontalSpeed();
+            updateCounter = 0;
+            updatesBeforeDirectionChange = generateRandomUpdatesBeforeDirectionChange();
+        }
     }
-
+    
+    
     @Override
     public void draw(Graphics g) { //Enemy picture, default for now
         g.setColor(Color.RED);
@@ -260,12 +302,15 @@ class Projectile extends Object { //Implement projectile here, maybe consider po
     @Override
     public void update() {
         // Update the projectile's position based on its speed and direction
+        y -= speed;
         // Check if the projectile is out of bounds and remove it from the game if necessary
     }
 
     @Override
     public void draw(Graphics g) {
         //projectile picture
+        g.setColor(Color.WHITE);
+        g.fillRect(x, y, width, height);
     }
 }
 
