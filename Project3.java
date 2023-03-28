@@ -6,15 +6,6 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-class Project3_6480279{
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            GameWindow gameWindow = new GameWindow();
-            gameWindow.setVisible(true);
-        });
-    }
-}
-
 class GameWindow extends JFrame {
     public GameWindow() {
         setTitle("Game Name");
@@ -26,6 +17,13 @@ class GameWindow extends JFrame {
         GamePanel gamePanel = new GamePanel();
         add(gamePanel);
         gamePanel.start();
+    }
+    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            GameWindow gameWindow = new GameWindow();
+            gameWindow.setVisible(true);
+        });
     }
 }
 
@@ -39,6 +37,8 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     private java.util.List<Enemy> enemies;
     private java.util.List<Projectile> projectiles;
     private long lastEnemySpawnTime;
+    
+    private GameWindow currentFrame;
 
     public GamePanel() {
         setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
@@ -46,7 +46,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         setFocusable(true);
         addKeyListener(this);
 
-        player = new Player(GAME_WIDTH / 2 - 25, GAME_HEIGHT - 100, 50, 50, PLAYER_SPEED);
+        player = new Player(GAME_WIDTH / 2 - 25, GAME_HEIGHT - 100, 100, 100, PLAYER_SPEED, currentFrame);
         enemies = new ArrayList<>();
         projectiles = new ArrayList<>();
     }
@@ -156,7 +156,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     }
 }
 
-abstract class Object {//parent class for all object in the game: player, enemy, projectile, etc.
+class Object extends JLabel{//parent class for all object in the game: player, enemy, projectile, etc.
     protected int x, y;
     protected int width, height;
     
@@ -167,9 +167,11 @@ abstract class Object {//parent class for all object in the game: player, enemy,
         this.height = height;
     }
 
-    public abstract void update();
+    public void update(){
+        
+    }
 
-    public abstract void draw(Graphics g);
+    public void draw(Graphics g){}
 
     public Rectangle getBounds() {
         return new Rectangle(x, y, width, height);
@@ -178,10 +180,17 @@ abstract class Object {//parent class for all object in the game: player, enemy,
 
 class Player extends Object {
     private int speed;
+    private MyImageIcon image;
+    private GameWindow parentFrame;
+    
+    String imageFile = "src/main/java/Project3_6480279/resources/jet.png";
 
-    public Player(int x, int y, int width, int height, int speed) {
+    public Player(int x, int y, int width, int height, int speed, GameWindow pf) {
         super(x, y, width, height);
+        parentFrame = pf;
         this.speed = speed;
+        image  = new MyImageIcon(imageFile).resize(width, height);
+        setIcon(image);
     }
 
     public void moveUp() {
@@ -234,8 +243,7 @@ class Player extends Object {
 
     @Override
     public void draw(Graphics g) { //Player picture, default for now
-        g.setColor(Color.BLUE);
-        g.fillRect(x, y, width, height);
+        g.drawImage(image.getImage(), x, y, width, height, parentFrame);
     }
 }
 
@@ -317,3 +325,15 @@ class Projectile extends Object { //Implement projectile here, maybe consider po
 class GamePhysic { //game physic will be in this class: projetile and enemy collision, enemy and player collision, etc.
     
 }
+
+// Auxiliary class to resize image
+class MyImageIcon extends ImageIcon {
+    public MyImageIcon(String fname)  { super(fname); }
+    public MyImageIcon(Image image)   { super(image); }
+
+    public MyImageIcon resize(int width, int height) {
+	Image oldimg = this.getImage();
+	Image newimg = oldimg.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
+	return new MyImageIcon(newimg);
+    }
+};
