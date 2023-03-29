@@ -81,6 +81,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         lastEnemySpawnTime = System.currentTimeMillis();
 
         while (isRunning) {
+            PlayerInput();
             update();
             repaint();
             try {
