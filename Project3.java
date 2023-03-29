@@ -56,7 +56,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         setFocusable(true);
         addKeyListener(this);
 
-        player = new Player(GAME_WIDTH / 2 - 25, GAME_HEIGHT - 100, 100, 100, PLAYER_SPEED, currentFrame);
+        player = new Player(GAME_WIDTH / 2 - 60, GAME_HEIGHT - 150, 100, 100, PLAYER_SPEED, currentFrame);
         enemies = new ArrayList<>();
         projectiles = new ArrayList<>();
     }
