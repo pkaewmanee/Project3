@@ -48,6 +48,65 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     private static final int BulletCooldown = 40;
     private GameWindow currentFrame;
     
+        //PUN PART; COPY THIS PART
+    private int difficulty;
+    private JButton	  startButton;
+    private JComboBox	  selectDifficulty;
+    private JRadioButton  [] types;
+    private boolean haveStarted = false;
+    private String [] comboString = {"Easy", "Medium", "Hard", "Very Hard", "Absurdly Impossible"};
+    
+    public void startScreen(){
+        //Start Button
+        startButton = new JButton("START GAMES");
+	startButton.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e )
+            {
+                haveStarted = true;
+            }
+        });
+        
+        selectDifficulty = new JComboBox(comboString);
+        selectDifficulty.setSelectedIndex(1);
+        selectDifficulty.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                String item = "" + e.getItem();
+                switch(item){
+                    case "Easy":
+                        difficulty = 1;
+                        break;
+                        
+                    case "Medium":
+                        difficulty = 2;
+                        break;
+                        
+                    case "Hard":
+                        difficulty = 3;
+                        break;
+                        
+                    case "Very Hard":
+                        difficulty = 4;
+                        break;
+                        
+                    case "Absurdly Impossible":
+                        difficulty = 5;
+                        break;
+                        
+                    default:
+                        difficulty = 2;
+                        break;
+                }
+                
+            }
+        }); 
+        
+        while(haveStarted == false){
+            
+        }
+    }
+    
     //String path = "src/main/java/Project3_6480279/resources/";
 
     public GamePanel() {
