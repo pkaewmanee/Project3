@@ -124,7 +124,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     private void spawnEnemy() {
         int x = (int) (Math.random() * (GAME_WIDTH - 50)); //ramdomly and within the frame
         int y = -50;
-        Enemy enemy = new Enemy(x, y, 50, 50);
+        Enemy enemy = new Enemy(x, y, 80, 90, currentFrame);
         enemies.add(enemy);
     }
 
@@ -215,6 +215,8 @@ class Object extends JLabel{//parent class for all object in the game: player, e
     protected int x, y;
     protected int width, height;
     
+    String path = "src/main/java/Project3_6480279/resources/";
+    
     public Object(int x, int y, int width, int height) {
         this.x = x;
         this.y = y;
@@ -236,13 +238,13 @@ class Player extends Object {
     private MyImageIcon image;
     private GameWindow parentFrame;
     
-    String imageFile = "src/main/java/Project3_6480279/resources/jet.png";
+    String playerImage = path + "jet.png";
 
     public Player(int x, int y, int width, int height, int speed, GameWindow pf) {
         super(x, y, width, height);
         parentFrame = pf;
         this.speed = speed;
-        image  = new MyImageIcon(imageFile).resize(width, height);
+        image  = new MyImageIcon(playerImage).resize(width, height);
         setIcon(image);
     }
 
@@ -305,13 +307,21 @@ class Enemy extends Object {
     private int horizontalspeed;
     private int updateCounter;
     private int updatesBeforeDirectionChange;
+    
+    private MyImageIcon image;
+    private GameWindow parentFrame;
+    
+    String enemyImage = path + "enemy.png";
 
-    public Enemy(int x, int y, int width, int height) {
+    public Enemy(int x, int y, int width, int height, GameWindow pf) {
         super(x, y, width, height);
         this.verticalspeed = 1;
         this.horizontalspeed = generateRandomHorizontalSpeed();
         this.updateCounter = 0;
         this.updatesBeforeDirectionChange = generateRandomUpdatesBeforeDirectionChange();
+        parentFrame = pf;
+        image  = new MyImageIcon(enemyImage).resize(width, height);
+        setIcon(image);
     }
     
     private int generateRandomHorizontalSpeed() {
@@ -346,8 +356,7 @@ class Enemy extends Object {
     
     @Override
     public void draw(Graphics g) { //Enemy picture, default for now
-        g.setColor(Color.RED);
-        g.fillRect(x, y, width, height);
+        g.drawImage(image.getImage(), x, y, width, height, parentFrame);
     }
 }
 
