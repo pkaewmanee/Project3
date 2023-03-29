@@ -39,6 +39,8 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     private long lastEnemySpawnTime;
     
     private GameWindow currentFrame;
+    
+    //String path = "src/main/java/Project3_6480279/resources/";
 
     public GamePanel() {
         setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
@@ -87,7 +89,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         }
     }
 
-    private void spawnEnemy() { //yee as the name said spawn enemy +_+
+    private void spawnEnemy() {
         int x = (int) (Math.random() * (GAME_WIDTH - 50)); //ramdomly and within the frame
         int y = -50;
         Enemy enemy = new Enemy(x, y, 50, 50);
@@ -167,9 +169,7 @@ class Object extends JLabel{//parent class for all object in the game: player, e
         this.height = height;
     }
 
-    public void update(){
-        
-    }
+    public void update(){ }
 
     public void draw(Graphics g){}
 
@@ -325,15 +325,3 @@ class Projectile extends Object { //Implement projectile here, maybe consider po
 class GamePhysic { //game physic will be in this class: projetile and enemy collision, enemy and player collision, etc.
     
 }
-
-// Auxiliary class to resize image
-class MyImageIcon extends ImageIcon {
-    public MyImageIcon(String fname)  { super(fname); }
-    public MyImageIcon(Image image)   { super(image); }
-
-    public MyImageIcon resize(int width, int height) {
-	Image oldimg = this.getImage();
-	Image newimg = oldimg.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
-	return new MyImageIcon(newimg);
-    }
-};
