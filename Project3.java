@@ -37,7 +37,15 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     private java.util.List<Enemy> enemies;
     private java.util.List<Projectile> projectiles;
     private long lastEnemySpawnTime;
-    
+    /*Boolean variable to keeps track if the button is pressed so that the character can do both action at the same time*/
+    private boolean moveleft;
+    private boolean moveright;
+    private boolean moveup;
+    private boolean movedown;
+    private boolean shoot;
+    /*Add cooldown between bullet*/
+    private long lastShotTime;
+    private static final int BulletCooldown = 40;
     private GameWindow currentFrame;
     
     //String path = "src/main/java/Project3_6480279/resources/";
@@ -88,7 +96,30 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
             }
         }
     }
-
+    
+    private void PlayerInput(){
+        if (moveleft) {
+            player.moveLeft();
+        }
+        else if (moveright) {
+            player.moveRight();
+        }
+        else if (moveup) {
+            player.moveUp();
+        }
+        else if (movedown) {
+            player.moveDown();
+        }
+        else if (shoot) {
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - lastShotTime > BulletCooldown) {
+                player.shoot(projectiles);
+                lastShotTime = currentTime;
+            }
+            
+        }
+    }
+    
     private void spawnEnemy() {
         int x = (int) (Math.random() * (GAME_WIDTH - 50)); //ramdomly and within the frame
         int y = -50;
@@ -124,19 +155,19 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         
         switch (keyCode) {
             case KeyEvent.VK_LEFT:
-                player.moveLeft();
+                moveleft = true;
                 break;
             case KeyEvent.VK_RIGHT:
-                player.moveRight();
+                moveright = true;
                 break;
             case KeyEvent.VK_UP:
-                player.moveUp();
+                moveup = true;
                 break;
             case KeyEvent.VK_DOWN:
-                player.moveDown();
+                movedown = true;
                 break;
             case KeyEvent.VK_Z:
-                player.shoot(projectiles);
+                shoot = true;
                 break;
             default:
                 break;
@@ -144,7 +175,28 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {}
+    public void keyReleased(KeyEvent e) {
+        int keyCode = e.getKeyCode();
+            switch (keyCode) {
+            case KeyEvent.VK_LEFT:
+                moveleft = false;
+                break;
+            case KeyEvent.VK_RIGHT:
+                moveright = false;
+                break;
+            case KeyEvent.VK_UP:
+                moveup = false;
+                break;
+            case KeyEvent.VK_DOWN:
+                movedown = false;
+                break;
+            case KeyEvent.VK_Z:
+                shoot = false;
+                break;
+            default:
+                break;
+        }
+    }
 
     @Override
     public void keyTyped(KeyEvent e) {}
