@@ -30,7 +30,7 @@ class GameWindow extends JFrame {
 class GamePanel extends JPanel implements Runnable, KeyListener {
     private static final int GAME_WIDTH = 600;
     private static final int GAME_HEIGHT = 800;
-    private static final int PLAYER_SPEED = 25;
+    private static final int PLAYER_SPEED = 7;
     private boolean isRunning;
     private Thread gameThread;
     private Player player;
