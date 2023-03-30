@@ -283,10 +283,6 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
             projectile.update();
         }
 	gamephysics.GamePhysicUpdate(player, enemies, projectiles);
-        
-        if (player.WhatMeLife() <= 0) {  ///THIS IS FOR TESTING FOR WHEN PLAYER HP REACHES 0 IT WILL END PROGRAM, PLEASE CHANGE THIS LATER -Chev
-            stop();
-        }
     }
 
     @Override
