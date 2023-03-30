@@ -13,19 +13,26 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
+import javax.imageio.ImageIO;
+import java.io.IOException;
 
 class GameWindow extends JFrame {
 
     private StartPanel startPanel;
     private GamePanel gamePanel;
+    
+    String path = "src/main/java/Project3_6480279/resources/";
 
     public GameWindow() {
-        setTitle("Game Name");
+        setTitle("Journey To The Stars");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(600, 800);
         setResizable(false); //Not allow user to resize 
         setLocationRelativeTo(null);
 
+        themeSound = new MySoundEffect(path + "theme.wav");
+        themeSound.playLoop(); themeSound.setVolume(0.4f);
         startPanel = new StartPanel(this);
         gamePanel = new GamePanel(this);
         add(startPanel);
@@ -242,6 +249,8 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     private long lastEnemyShotTime;
     private GamePhysic gamephysics;
     private GameWindow currentFrame;
+    
+    private Image background;
 
     public void updateDifficulty(int difficulty) {
         this.damageMultiplier = difficulty;
@@ -258,13 +267,21 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         damageMultiplier = startPanel.getDifficulty();
         System.out.print(healthMultiplier + " " + damageMultiplier);
         setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
-        setBackground(Color.BLACK); // Default background for now, need change!
-        setFocusable(true);
-        addKeyListener(this);
+        
+        setLayout(null);
+        try {
+            background = ImageIO.read(new File("src/main/java/Project3_6480279/resources/background.png"));
+        } catch (IOException e) {
+            System.err.println(e);
+        }
+       
         player = new Player(GAME_WIDTH / 2 - 60, GAME_HEIGHT - 150, 30, 30, PLAYER_SPEED, currentFrame);
         enemies = new ArrayList<>();
         projectiles = new ArrayList<>();
         gamephysics = new GamePhysic();
+        
+        setFocusable(true);
+        addKeyListener(this);
     }
 
     public void VictoryRoyal(Graphics g) {
@@ -371,6 +388,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        g.drawImage(background, 0, 0, getWidth(), getHeight(), null);
         player.update();
         player.draw(g);
         if (player.WhatMeLife() <= 0) {
@@ -500,6 +518,8 @@ class Player extends Object {
     private int score = 0;
 
     String playerImage = path + "jet.png";
+    
+    private String projectileImage = path + "projectile_p.png";
 
     public Player(int x, int y, int width, int height, int speed, GameWindow pf) {
         super(x, y, width, height, 100, 10);
@@ -544,12 +564,12 @@ class Player extends Object {
     }
 
     public void shoot(java.util.List<Projectile> projectile) {
-        int projectileWidth = 3;
-        int projectileHeight = 7;
+        int projectileWidth = 10;
+        int projectileHeight = 15;
         int projectileSpeed = 10;
         int projectileX = x + width / 2 - projectileWidth / 2;
         int projectileY = y - projectileHeight;
-        projectile.add(new Projectile(projectileX, projectileY, projectileWidth, projectileHeight, projectileSpeed, damage));
+        projectile.add(new Projectile(projectileX, projectileY, projectileWidth, projectileHeight, projectileSpeed, damage, projectileImage, parentFrame));
     }
 
     public void IncreaseScore(int points) {
@@ -583,6 +603,8 @@ class Enemy extends Object {
     private GameWindow parentFrame;
 
     String enemyImage = path + "enemy.png";
+    
+    private String projectileImage = path + "projectile_e.png";
 
     public Enemy(int x, int y, int width, int height, int health, int damage, GameWindow pf, int healthMultiplier, int damageMultiplier) {
         super(x, y, width, height, health * healthMultiplier, damage * damageMultiplier);
@@ -604,12 +626,12 @@ class Enemy extends Object {
     }
 
     public void shoot(java.util.List<Projectile> projectile) {
-        int projectileWidth = 3;
-        int projectileHeight = 7;
+        int projectileWidth = 15;
+        int projectileHeight = 15;
         int projectileSpeed = -7;
         int projectileX = x + width / 2 - projectileWidth / 2;
         int projectileY = y + height;
-        projectile.add(new Projectile(projectileX, projectileY, projectileWidth, projectileHeight, projectileSpeed, damage));
+        projectile.add(new Projectile(projectileX, projectileY, projectileWidth, projectileHeight, projectileSpeed, damage, projectileImage, parentFrame));
     }
 
     @Override
@@ -643,11 +665,20 @@ class Projectile extends Object { //Implement projectile here, maybe consider po
 
     private int speed;
     private boolean OutOfBoundProjectile;
+    private String imagePath;
+    private MyImageIcon image;
+    private GameWindow parentFrame;
 
-    public Projectile(int x, int y, int width, int height, int speed, int damage) {
+    public Projectile(int x, int y, int width, int height, int speed, int damage, String imagePath, GameWindow parentFrame) {
         super(x, y, width, height, 0, damage);
         this.speed = speed;
         this.OutOfBoundProjectile = false;
+        
+        this.imagePath = imagePath;
+        this.parentFrame = parentFrame;
+        
+        image = new MyImageIcon(imagePath).resize(width, height);
+        setIcon(image);
     }
 
     public boolean OutOfBoundBullet() {
@@ -670,9 +701,7 @@ class Projectile extends Object { //Implement projectile here, maybe consider po
 
     @Override
     public void draw(Graphics g) {
-        //projectile picture
-        g.setColor(Color.WHITE);
-        g.fillRect(x, y, width, height);
+        g.drawImage(image.getImage(), x, y, width, height, parentFrame);
     }
 }
 
