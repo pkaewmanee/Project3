@@ -419,7 +419,7 @@ class Player extends Object {
     String playerImage = path + "jet.png";
 
     public Player(int x, int y, int width, int height, int speed, GameWindow pf) {
-        super(x, y, width, height);
+        super(x, y, width, height, 100, 10);
         parentFrame = pf;
         this.speed = speed;
         image  = new MyImageIcon(playerImage).resize(width, height);
@@ -492,7 +492,7 @@ class Enemy extends Object {
     String enemyImage = path + "enemy.png";
 
     public Enemy(int x, int y, int width, int height, GameWindow pf) {
-        super(x, y, width, height);
+        super(x, y, width, height, 100, 50);
         this.verticalspeed = 1;
         this.horizontalspeed = RandomHorizontalSpeed();
         this.updateCounter = 0;
@@ -533,7 +533,7 @@ class Enemy extends Object {
             horizontalspeed = -horizontalspeed;
         }
         updateCounter++;
-        if (updateCounter >= updatesBeforeDirectionChange) {
+        if (updateCounter >= updatesDirectionChange) {
             horizontalspeed = RandomHorizontalSpeed();
             updateCounter = 0;
             updatesDirectionChange = RandomDirectionChange();
