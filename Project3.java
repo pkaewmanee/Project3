@@ -12,16 +12,27 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 class GameWindow extends JFrame {
+    private StartPanel startPanel;
+    private GamePanel gamePanel;
+    
     public GameWindow() {
         setTitle("Game Name");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize( 600, 800);
+        setSize(600, 800);
         setResizable(false); //Not allow user to resize 
         setLocationRelativeTo(null);
-
-        GamePanel gamePanel = new GamePanel();
+        
+        startPanel = new StartPanel(this);
+        gamePanel = new GamePanel(this);
+        add(startPanel);
+    }
+    
+    public void startGame() {
+        remove(startPanel);
         add(gamePanel);
         gamePanel.start();
+        validate();
+        repaint();
     }
     
     public static void main(String[] args) {
@@ -29,6 +40,60 @@ class GameWindow extends JFrame {
             GameWindow gameWindow = new GameWindow();
             gameWindow.setVisible(true);
         });
+    }
+}
+
+class StartPanel extends JPanel {
+    private GameWindow gameWindow;
+    private JButton startButton;
+    private JComboBox<String> selectDifficulty;
+    private JRadioButton[] healthOptions;
+    
+    public StartPanel(GameWindow gameWindow) {
+        this.gameWindow = gameWindow;
+        
+        // Start Button
+        startButton = new JButton("START GAME");
+        startButton.addActionListener(e -> gameWindow.startGame());
+        
+        // Difficulty level selection
+        String[] comboString = {"Easy", "Medium", "Hard", "Very Hard", "Absurdly Impossible"};
+        selectDifficulty = new JComboBox<>(comboString);
+        selectDifficulty.setSelectedIndex(1);
+        
+        // Health power selection
+        ButtonGroup healthGroup = new ButtonGroup();
+        healthOptions = new JRadioButton[5];
+        for (int i = 0; i < healthOptions.length; i++) {
+            healthOptions[i] = new JRadioButton(String.format("%dx Health", 1 << i));
+            healthOptions[i].setSelected(i == 0);
+            healthGroup.add(healthOptions[i]);
+        }
+        
+        // Layout components
+        setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.insets = new Insets(10, 10, 10, 10);
+        add(new JLabel("Select Difficulty Level:"), c);
+        c.gridx = 1;
+        add(selectDifficulty, c);
+        c.gridx = 0;
+        c.gridy = 1;
+        add(new JLabel("Select Health Power:"), c);
+        c.gridx = 1;
+        JPanel healthPanel = new JPanel(new GridLayout(0, 1));
+        for (JRadioButton option : healthOptions) {
+            healthPanel.add(option);
+        }
+        add(healthPanel, c);
+        c.gridx = 0;
+        c.gridy = 2;
+        c.gridwidth = 2;
+        c.anchor = GridBagConstraints.CENTER;
+        add(startButton, c);
     }
 }
 
@@ -55,155 +120,24 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     private long lastEnemyShotTime;
     private GamePhysic gamephysics;
     private GameWindow currentFrame;
-    
-    
-        //PUN PART
-    private int difficulty;
-    private JButton	  startButton;
-    private JComboBox	  selectDifficulty;
-    private JRadioButton  [] types;
-    private boolean haveStarted = false;
-    private String [] comboString = {"Easy", "Medium", "Hard", "Very Hard", "Absurdly Impossible"};
-	private ButtonGroup healthGroup;
-    private JToggleButton [] setHealth;
-    private int healthPower;
-    
-    public void startScreen(){
-        //Start Button
-        startButton = new JButton("START GAMES");
-	startButton.addActionListener( new ActionListener() {
-            @Override
-            public void actionPerformed( ActionEvent e )
-            {
-                haveStarted = true;
-            }
-        });
-        
-        selectDifficulty = new JComboBox(comboString);
-        selectDifficulty.setSelectedIndex(1);
-        selectDifficulty.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                String item = "" + e.getItem();
-                switch(item){
-                    case "Easy":
-                        difficulty = 1;
-                        break;
-                        
-                    case "Medium":
-                        difficulty = 2;
-                        break;
-                        
-                    case "Hard":
-                        difficulty = 3;
-                        break;
-                        
-                    case "Very Hard":
-                        difficulty = 4;
-                        break;
-                        
-                    case "Absurdly Impossible":
-                        difficulty = 5;
-                        break;
-                        
-                    default:
-                        difficulty = 2;
-                        break;
-                }
-                
-            }
-        }); 
-	    
-	setHealth = new JToggleButton[5];
-        healthGroup = new ButtonGroup();
-        
-        //Button 1
-        setHealth[0] = new JRadioButton("1x Health"); 
-        setHealth[0].setName("1x Health");
-        setHealth[0].addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if(e.getStateChange() == e.SELECTED){
-                    healthPower = 0;
-                }
-            }
-        });
-        
-        //Button 2
-        setHealth[1] = new JRadioButton("2x Health"); 
-        setHealth[1].setName("2x Health");
-        setHealth[1].addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if(e.getStateChange() == e.SELECTED){
-                    healthPower = 1;
-                }
-            }
-        });
-        
-        //Button 3
-        setHealth[2] = new JRadioButton("4x Health"); 
-        setHealth[2].setName("4x Health");
-        setHealth[2].addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if(e.getStateChange() == e.SELECTED){
-                    healthPower = 2;
-                }
-            }
-        });
-        
-        //Button 4
-        setHealth[3] = new JRadioButton("8x Health"); 
-        setHealth[3].setName("8x Health");
-        setHealth[3].addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if(e.getStateChange() == e.SELECTED){
-                    healthPower = 3;
-                }
-            }
-        });
-        
-        //Button 5
-        setHealth[4] = new JRadioButton("16x Health"); 
-        setHealth[4].setName("16x Health");
-        setHealth[4].addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if(e.getStateChange() == e.SELECTED){
-                    healthPower = 4;
-                }
-            }
-        });
-        
-        //Select button 1 first and add to healthGroup
-        setHealth[0].setSelected(true);
-        for (int i = 0; i<5; i++){
-            healthGroup.add(setHealth[i]);
-        }
-        
-        //wait for start button to be pressed    
-        while(haveStarted == false){
-            
-        }
-    }
-    
-    //String path = "src/main/java/Project3_6480279/resources/";
+    //
 
-    public GamePanel() {
+    public GamePanel(GameWindow currentFrame) {
+        this.currentFrame = currentFrame;
         setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
-        setBackground(Color.BLACK); //Default background for now, need change!
+        setBackground(Color.BLACK); // Default background for now, need change!
         setFocusable(true);
         addKeyListener(this);
 
-        player = new Player(GAME_WIDTH / 2 - 60, GAME_HEIGHT - 150, 100, 100, PLAYER_SPEED, currentFrame);
+        player = new Player(GAME_WIDTH / 2 - 60, GAME_HEIGHT - 150, 30, 30, PLAYER_SPEED, currentFrame);
         enemies = new ArrayList<>();
         projectiles = new ArrayList<>();
-	gamephysics = new GamePhysic();
+        gamephysics = new GamePhysic();
     }
 
+
     public void start() {
+        requestFocus();
         isRunning = true;
         gameThread = new Thread(this);
         gameThread.start();
@@ -245,22 +179,21 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         if (moveleft) {
             player.moveLeft();
         }
-        else if (moveright) {
+        if (moveright) {
             player.moveRight();
         }
-        else if (moveup) {
+        if (moveup) {
             player.moveUp();
         }
-        else if (movedown) {
+        if (movedown) {
             player.moveDown();
         }
-        else if (shoot) {
+        if (shoot) {
             long currentTime = System.currentTimeMillis();
             if (currentTime - lastShotTime > BulletCooldown) {
                 player.shoot(projectiles);
                 lastShotTime = currentTime;
             }
-            
         }
     }
 	
@@ -299,6 +232,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        player.update();
         player.draw(g);
         for (Enemy enemy : enemies) {
             enemy.draw(g);
@@ -471,12 +405,13 @@ class Player extends Object {
 
     @Override
     public void update() {
+        setLocation(x, y);
         // Update player's position, etc.
     }
 
     @Override
     public void draw(Graphics g) { //Player picture, default for now
-        g.drawImage(image.getImage(), x, y, width, height, parentFrame);
+        g.drawImage(image.getImage(), x, y, 50, 50, parentFrame);
     }
 }
 
