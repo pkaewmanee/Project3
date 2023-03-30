@@ -186,7 +186,15 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         gamephysics = new GamePhysic();
     }
 
-
+    public void VictoryRoyal(Graphics g) {
+        String End = "Game Over";
+        String TotalScore = "Total Score: " + player.getScore();
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.PLAIN, 40));
+        g.drawString(End, getWidth() / 2 - 100, getHeight() / 2 - 50);
+        g.drawString(TotalScore,getWidth() / 2 - 100, getHeight() / 2);
+    }
+    
     public void start() {
         requestFocus();
         isRunning = true;
@@ -286,6 +294,10 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         super.paintComponent(g);
         player.update();
         player.draw(g);
+	if (player.WhatMeLife() <= 0) {
+            VictoryRoyal(g);
+            return;
+        }
         for (Enemy enemy : enemies) {
             enemy.draw(g);
         }
@@ -401,6 +413,7 @@ class Player extends Object {
     private int speed;
     private MyImageIcon image;
     private GameWindow parentFrame;
+    private int score = 0;
     
     String playerImage = path + "jet.png";
 
@@ -455,6 +468,14 @@ class Player extends Object {
         projectile.add(new Projectile(projectileX,projectileY,projectileWidth,projectileHeight,projectileSpeed, damage));
     }
 
+    public void IncreaseScore(int points) { //NEW
+        score += points;
+    }
+    
+    public int getScore() { //NEW
+        return score;
+    }
+	
     @Override
     public void update() {
         setLocation(x, y);
@@ -574,7 +595,7 @@ class GamePhysic { //game physic will be in this class: projetile and enemy coll
     public void GamePhysicUpdate(Player player, java.util.List<Enemy> enemies, java.util.List<Projectile> projectiles){
         PlayerToEnemyCollision(player, enemies);
         ProjectileCollisionPlayer(player,projectiles);
-        ProjectileCollisionEnemy(enemies,projectiles);
+        ProjectileCollisionEnemy(player,enemies,projectiles);
     }
     private void PlayerToEnemyCollision(Player player, java.util.List<Enemy> enemies){ //This will check collision between player and enemy, if the player hitbox intersect with enemy hitbox the player will take damage
         Rectangle playerBounds = player.getBounds(); //Use rectangle to get the hitbox of player
@@ -594,7 +615,7 @@ class GamePhysic { //game physic will be in this class: projetile and enemy coll
            return false;
         });
     }
-    private void ProjectileCollisionEnemy(java.util.List<Enemy> enemies, java.util.List<Projectile> projectiles){
+    private void ProjectileCollisionEnemy(Player player, java.util.List<Enemy> enemies, java.util.List<Projectile> projectiles){
         projectiles.removeIf(projectile -> { //This will make the bullet disappear once it hit an enemy
            if(projectile.getSpeed() > 0) { //this will check if the bullet comes from player or not (player bullet speed is in positive)
                Rectangle bulletBounds = projectile.getBounds();
@@ -603,6 +624,7 @@ class GamePhysic { //game physic will be in this class: projetile and enemy coll
                        enemy.MeLifeIs(enemy.WhatMeLife() - projectile.getDamage()); //Decrease enemy hp
                        if (enemy.WhatMeLife() <= 0) { //If enemy hp is less than or equal to 0 it will delete the enemy
                            enemies.remove(enemy);
+			   player.IncreaseScore(10); //Increase player score whenever they kills an enemy
                        }
                        return true; //remove projectile from list
                    }
