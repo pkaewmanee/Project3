@@ -53,13 +53,16 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     private static final int BulletCooldown = 40;
     private GameWindow currentFrame;
     
-        //PUN PART; COPY THIS PART
+        //PUN PART
     private int difficulty;
     private JButton	  startButton;
     private JComboBox	  selectDifficulty;
     private JRadioButton  [] types;
     private boolean haveStarted = false;
     private String [] comboString = {"Easy", "Medium", "Hard", "Very Hard", "Absurdly Impossible"};
+	private ButtonGroup healthGroup;
+    private JToggleButton [] setHealth;
+    private int healthPower;
     
     public void startScreen(){
         //Start Button
@@ -106,7 +109,77 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
                 
             }
         }); 
+	    
+	setHealth = new JToggleButton[5];
+        healthGroup = new ButtonGroup();
         
+        //Button 1
+        setHealth[0] = new JRadioButton("1x Health"); 
+        setHealth[0].setName("1x Health");
+        setHealth[0].addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if(e.getStateChange() == e.SELECTED){
+                    healthPower = 0;
+                }
+            }
+        });
+        
+        //Button 2
+        setHealth[1] = new JRadioButton("2x Health"); 
+        setHealth[1].setName("2x Health");
+        setHealth[1].addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if(e.getStateChange() == e.SELECTED){
+                    healthPower = 1;
+                }
+            }
+        });
+        
+        //Button 3
+        setHealth[2] = new JRadioButton("4x Health"); 
+        setHealth[2].setName("4x Health");
+        setHealth[2].addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if(e.getStateChange() == e.SELECTED){
+                    healthPower = 2;
+                }
+            }
+        });
+        
+        //Button 4
+        setHealth[3] = new JRadioButton("8x Health"); 
+        setHealth[3].setName("8x Health");
+        setHealth[3].addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if(e.getStateChange() == e.SELECTED){
+                    healthPower = 3;
+                }
+            }
+        });
+        
+        //Button 5
+        setHealth[4] = new JRadioButton("16x Health"); 
+        setHealth[4].setName("16x Health");
+        setHealth[4].addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if(e.getStateChange() == e.SELECTED){
+                    healthPower = 4;
+                }
+            }
+        });
+        
+        //Select button 1 first and add to healthGroup
+        setHealth[0].setSelected(true);
+        for (int i = 0; i<5; i++){
+            healthGroup.add(setHealth[i]);
+        }
+        
+        //wait for start button to be pressed    
         while(haveStarted == false){
             
         }
