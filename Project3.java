@@ -3,9 +3,8 @@ Possathorn Sujipisut 6480274
 Supakorn Unjindamanee 6480279
 Phakkhapon Kaewmanee 6480929
 Jawit Poopradit      6480087
-*/
-
-package Project3_6480279;
+ */
+package Project3;
 
 import java.util.*;
 import javax.swing.*;
@@ -16,21 +15,22 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 class GameWindow extends JFrame {
+
     private StartPanel startPanel;
     private GamePanel gamePanel;
-    
+
     public GameWindow() {
         setTitle("Game Name");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(600, 800);
         setResizable(false); //Not allow user to resize 
         setLocationRelativeTo(null);
-        
+
         startPanel = new StartPanel(this);
         gamePanel = new GamePanel(this);
         add(startPanel);
     }
-    
+
     public void startGame() {
         remove(startPanel);
         add(gamePanel);
@@ -38,7 +38,15 @@ class GameWindow extends JFrame {
         validate();
         repaint();
     }
-    
+
+    public void updateDifficulty(int difficulty) {
+        gamePanel.updateDifficulty(difficulty);
+    }
+
+    public void updateHealthPower(int power) {
+        gamePanel.updateHealthPower(power);
+    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             GameWindow gameWindow = new GameWindow();
@@ -48,62 +56,66 @@ class GameWindow extends JFrame {
 }
 
 class StartPanel extends JPanel {
+
     private GameWindow gameWindow;
     private JButton startButton;
     private JComboBox<String> selectDifficulty;
     private JRadioButton[] healthOptions;
     private JButton creditsButton;
     private JTextField playerNameField;
-    
+    private ButtonGroup healthGroup;
+
     public StartPanel(GameWindow gameWindow) {
         this.gameWindow = gameWindow;
-        
+
         //Player Name Field
         playerNameField = new JTextField(15);
-        
+
         // Start Button
         startButton = new JButton("START GAME");
         startButton.addActionListener(e -> gameWindow.startGame());
-        
+
         // Difficulty level selection
         String[] comboString = {"Easy", "Medium", "Hard", "Extreme", "Mayhem"};
         selectDifficulty = new JComboBox<>(comboString);
         selectDifficulty.setSelectedIndex(1);
-        
+        selectDifficulty.addActionListener(e -> gameWindow.updateDifficulty(getDifficulty()));
+
         // Health power selection
-        ButtonGroup healthGroup = new ButtonGroup();
+        healthGroup = new ButtonGroup();
         healthOptions = new JRadioButton[5];
         for (int i = 0; i < healthOptions.length; i++) {
             healthOptions[i] = new JRadioButton(String.format("%dx Health", 1 << i));
             healthOptions[i].setSelected(i == 0);
+            healthOptions[i].addActionListener(e -> gameWindow.updateHealthPower(getHealthPower()));
             healthGroup.add(healthOptions[i]);
         }
-        
+
         creditsButton = new JButton("CREDITS");
-        creditsButton.addActionListener(new ActionListener (){
+        creditsButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e){
+            public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(
-                        null, 
+                        null,
                         """
-                        Game developed by:
-                        Supakorn Unjindamanee 6480279
-                        Jawit Poopradit       6480087
-                        Possathorn Sujipisut 6480274
-			Phakkhapon Kaewmanee 6480929
-                                                    """, 
+                    Game developed by:
+                    Supakorn Unjindamanee 6480279
+                    Jawit Poopradit       6480087
+                    Possathorn Sujipisut 6480274
+                    Phakkhapon Kaewmanee 6480929
+                                                """,
                         "Credits",
                         JOptionPane.INFORMATION_MESSAGE
                 );
             }
         });
-        
+
         // Layout components
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(10, 10, 10, 10);
-        
+
         //Add Player Name
         c.gridx = 0;
         c.gridy = 0;
@@ -112,14 +124,14 @@ class StartPanel extends JPanel {
         c.gridx = 1;
         c.anchor = GridBagConstraints.CENTER;
         add(playerNameField, c);
-        
+
         //start button
         c.gridx = 0;
         c.gridy = 1;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.CENTER;
         add(startButton, c);
-        
+
         //Select Difficulty
         c.gridx = 0;
         c.gridy = 2;
@@ -128,7 +140,7 @@ class StartPanel extends JPanel {
         add(new JLabel("Select Difficulty Level:"), c);
         c.gridx = 1;
         add(selectDifficulty, c);
-        
+
         //Select Health Power
         c.gridx = 0;
         c.gridy = 3;
@@ -139,7 +151,7 @@ class StartPanel extends JPanel {
             healthPanel.add(option);
         }
         add(healthPanel, c);
-        
+
         //credits button
         c.gridx = 0;
         c.gridy = 4;
@@ -147,17 +159,64 @@ class StartPanel extends JPanel {
         c.anchor = GridBagConstraints.EAST;
         add(creditsButton, c);
     }
-    public int getSelectedHealthMultiplier() {
-    for (int i = 0; i < healthOptions.length; i++) {
-        if (healthOptions[i].isSelected()) {
-            return 1 << i;
+
+    public void setPlayerName(String name) {
+        playerNameField.setText(name);
+    }
+
+    public String getPlayerName() {
+        return playerNameField.getText();
+    }
+
+    public void setDifficulty(String difficulty) {
+        selectDifficulty.setSelectedItem(difficulty);
+    }
+
+    public int getDifficulty() {
+        String x = (String) selectDifficulty.getSelectedItem();
+        switch (x) {
+            case "Easy":
+                return 1;
+            case "Medium":
+                return 2;
+            case "Hard":
+                return 3;
+            case "Extreme":
+                return 4;
+            case "Mayhem":
+                return 5;
+            default:
+                return 0;
         }
     }
-    return 1;
+
+    public void setHealthPower(int power) {
+        for (int i = 0; i < healthOptions.length; i++) {
+            if ((1 << i) == power) {
+                healthOptions[i].setSelected(true);
+                break;
+            }
+        }
     }
+
+    public int getHealthPower() {
+        int healthPower = 0;
+        Enumeration<AbstractButton> buttons = healthGroup.getElements();
+        while (buttons.hasMoreElements()) {
+            JRadioButton button = (JRadioButton) buttons.nextElement();
+            if (button.isSelected()) {
+                String buttonText = button.getText();
+                healthPower = Integer.parseInt(buttonText.substring(0, buttonText.indexOf("x")).trim());
+                break;
+            }
+        }
+        return healthPower;
+    }
+
 }
 
 class GamePanel extends JPanel implements Runnable, KeyListener {
+
     private StartPanel startPanel;
     private static final int GAME_WIDTH = 600;
     private static final int GAME_HEIGHT = 800;
@@ -169,6 +228,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     private java.util.List<Projectile> projectiles;
     private long lastEnemySpawnTime;
     private int healthMultiplier;
+    private int damageMultiplier;
     /*Boolean variable to keeps track if the button is pressed so that the character can do both action at the same time*/
     private boolean moveleft;
     private boolean moveright;
@@ -183,15 +243,23 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     private GamePhysic gamephysics;
     private GameWindow currentFrame;
 
+    public void updateDifficulty(int difficulty) {
+        this.damageMultiplier = difficulty;
+    }
+
+    public void updateHealthPower(int power) {
+        this.healthMultiplier = power;
+    }
+
     public GamePanel(GameWindow currentFrame) {
-	this.startPanel = new StartPanel(currentFrame);
-        this.healthMultiplier = startPanel.getSelectedHealthMultiplier();
+        this.startPanel = new StartPanel(currentFrame);
         this.currentFrame = currentFrame;
+        healthMultiplier = startPanel.getHealthPower();
+        damageMultiplier = startPanel.getDifficulty();
         setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
         setBackground(Color.BLACK); // Default background for now, need change!
         setFocusable(true);
         addKeyListener(this);
-
         player = new Player(GAME_WIDTH / 2 - 60, GAME_HEIGHT - 150, 30, 30, PLAYER_SPEED, currentFrame);
         enemies = new ArrayList<>();
         projectiles = new ArrayList<>();
@@ -204,9 +272,9 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.PLAIN, 40));
         g.drawString(End, getWidth() / 2 - 100, getHeight() / 2 - 50);
-        g.drawString(TotalScore,getWidth() / 2 - 100, getHeight() / 2);
+        g.drawString(TotalScore, getWidth() / 2 - 100, getHeight() / 2);
     }
-    
+
     public void start() {
         requestFocus();
         isRunning = true;
@@ -225,11 +293,12 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
 
     @Override
     public void run() {
+
         lastEnemySpawnTime = System.currentTimeMillis();
 
         while (isRunning) {
             PlayerInput();
-	    EnemyShoot();
+            EnemyShoot();
             update();
             projectiles.removeIf(Projectile::OutOfBoundBullet);
             repaint();
@@ -246,8 +315,8 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
             }
         }
     }
-    
-    private void PlayerInput(){
+
+    private void PlayerInput() {
         if (moveleft) {
             player.moveLeft();
         }
@@ -268,9 +337,9 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
             }
         }
     }
-	
+
     private void EnemyShoot() {
-    long currentTime = System.currentTimeMillis();
+        long currentTime = System.currentTimeMillis();
         if (currentTime - lastEnemyShotTime > EnemyShotCooldown) {
             for (Enemy enemy : enemies) {
                 enemy.shoot(projectiles);
@@ -278,11 +347,12 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
             lastEnemyShotTime = currentTime;
         }
     }
-    
+
     private void spawnEnemy() {
         int x = (int) (Math.random() * (GAME_WIDTH - 50)); //ramdomly and within the frame
         int y = -50;
-        Enemy enemy = new Enemy(x, y, 80, 90, 200, 30,currentFrame, healthMultiplier);
+        //Enemy enemy = new Enemy(x, y, 80, 90, 200, 30,currentFrame, healthMultiplier);
+        Enemy enemy = new Enemy(x, y, 80, 90, 100, 30, currentFrame, healthMultiplier, damageMultiplier);
         enemies.add(enemy);
     }
 
@@ -294,7 +364,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         for (Projectile projectile : projectiles) {
             projectile.update();
         }
-	gamephysics.GamePhysicUpdate(player, enemies, projectiles);
+        gamephysics.GamePhysicUpdate(player, enemies, projectiles);
     }
 
     @Override
@@ -302,7 +372,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         super.paintComponent(g);
         player.update();
         player.draw(g);
-	if (player.WhatMeLife() <= 0) {
+        if (player.WhatMeLife() <= 0) {
             VictoryRoyal(g);
             return;
         }
@@ -313,11 +383,11 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
             projectile.draw(g);
         }
     }
-    
+
     @Override
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
-        
+
         switch (keyCode) {
             case KeyEvent.VK_LEFT:
                 moveleft = true;
@@ -342,7 +412,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
         int keyCode = e.getKeyCode();
-            switch (keyCode) {
+        switch (keyCode) {
             case KeyEvent.VK_LEFT:
                 moveleft = false;
                 break;
@@ -364,31 +434,33 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {}
-    
-    public static int getGameHeight(){
+    public void keyTyped(KeyEvent e) {
+    }
+
+    public static int getGameHeight() {
         return GAME_HEIGHT;
     }
-    
-    public static int getGameWidth(){
+
+    public static int getGameWidth() {
         return GAME_WIDTH;
     }
 }
 
-class Object extends JLabel{//parent class for all object in the game: player, enemy, projectile, etc.
+class Object extends JLabel {//parent class for all object in the game: player, enemy, projectile, etc.
+
     protected int x, y;
     protected int width, height;
     protected int health;
     protected int damage;
-    
-    String path = "src/main/java/Project3_6480279/resources/";
-    
+
+    String path = "src/main/java/Project3/resources/";
+
     public Object(int x, int y, int width, int height, int health, int damage) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-	this.health = health;
+        this.health = health;
         this.damage = damage;
     }
 
@@ -408,9 +480,11 @@ class Object extends JLabel{//parent class for all object in the game: player, e
         this.damage = damage;
     }
 
-    public void update(){ }
+    public void update() {
+    }
 
-    public void draw(Graphics g){}
+    public void draw(Graphics g) {
+    }
 
     public Rectangle getBounds() {
         return new Rectangle(x, y, width, height);
@@ -418,18 +492,20 @@ class Object extends JLabel{//parent class for all object in the game: player, e
 }
 
 class Player extends Object {
+
     private int speed;
     private MyImageIcon image;
     private GameWindow parentFrame;
     private int score = 0;
-    
+
     String playerImage = path + "jet.png";
 
     public Player(int x, int y, int width, int height, int speed, GameWindow pf) {
-        super(x, y, width, height, 100, 10);
+        //super(x, y, width, height, 100, 10);
+        super(x, y, width, height, 100, 100);
         parentFrame = pf;
         this.speed = speed;
-        image  = new MyImageIcon(playerImage).resize(width, height);
+        image = new MyImageIcon(playerImage).resize(width, height);
         setIcon(image);
     }
 
@@ -466,24 +542,24 @@ class Player extends Object {
         }
         update();
     }
-    
-    public void shoot(java.util.List<Projectile> projectile){
+
+    public void shoot(java.util.List<Projectile> projectile) {
         int projectileWidth = 3;
         int projectileHeight = 7;
         int projectileSpeed = 10;
         int projectileX = x + width / 2 - projectileWidth / 2;
         int projectileY = y - projectileHeight;
-        projectile.add(new Projectile(projectileX,projectileY,projectileWidth,projectileHeight,projectileSpeed, damage));
+        projectile.add(new Projectile(projectileX, projectileY, projectileWidth, projectileHeight, projectileSpeed, damage));
     }
 
     public void IncreaseScore(int points) {
         score += points;
     }
-    
+
     public int getScore() {
         return score;
     }
-	
+
     @Override
     public void update() {
         setLocation(x, y);
@@ -497,50 +573,51 @@ class Player extends Object {
 }
 
 class Enemy extends Object {
+
     private int verticalspeed;
     private int horizontalspeed;
     private int updateCounter;
     private int updatesDirectionChange;
-    
+
     private MyImageIcon image;
     private GameWindow parentFrame;
-    
+
     String enemyImage = path + "enemy.png";
 
-    public Enemy(int x, int y, int width, int height, int health, int damage, GameWindow pf, int healthMultiplier) {
-        super(x, y, width, height, health * healthMultiplier, damage);
+    public Enemy(int x, int y, int width, int height, int health, int damage, GameWindow pf, int healthMultiplier, int damageMultiplier) {
+        super(x, y, width, height, health * healthMultiplier, damage * damageMultiplier);
         this.verticalspeed = 1;
         this.horizontalspeed = RandomHorizontalSpeed();
         this.updateCounter = 0;
         this.updatesDirectionChange = RandomDirectionChange();
         parentFrame = pf;
-        image  = new MyImageIcon(enemyImage).resize(width, height);
+        image = new MyImageIcon(enemyImage).resize(width, height);
         setIcon(image);
     }
-    
+
     private int RandomHorizontalSpeed() {
         return new Random().nextInt(5) - 2;
     }
-    
+
     private int RandomDirectionChange() {
         return new Random().nextInt(71) + 30;
     }
-    
-    public void shoot(java.util.List<Projectile> projectile){
+
+    public void shoot(java.util.List<Projectile> projectile) {
         int projectileWidth = 3;
         int projectileHeight = 7;
         int projectileSpeed = -7;
         int projectileX = x + width / 2 - projectileWidth / 2;
         int projectileY = y + height;
-        projectile.add(new Projectile(projectileX,projectileY,projectileWidth,projectileHeight,projectileSpeed, damage));
+        projectile.add(new Projectile(projectileX, projectileY, projectileWidth, projectileHeight, projectileSpeed, damage));
     }
-	
+
     @Override
     public void update() {
         // Update enemy's position, behavior, etc.
         y += verticalspeed;
         x += horizontalspeed;
-        
+
         if (x < 0) {
             x = 0;
             horizontalspeed = -horizontalspeed;
@@ -555,8 +632,7 @@ class Enemy extends Object {
             updatesDirectionChange = RandomDirectionChange();
         }
     }
-    
-    
+
     @Override
     public void draw(Graphics g) { //Enemy picture, default for now
         g.drawImage(image.getImage(), x, y, width, height, parentFrame);
@@ -564,20 +640,21 @@ class Enemy extends Object {
 }
 
 class Projectile extends Object { //Implement projectile here, maybe consider powerboost to change projectile (maybe additional class)
+
     private int speed;
     private boolean OutOfBoundProjectile;
 
     public Projectile(int x, int y, int width, int height, int speed, int damage) {
-        super(x, y, width, height, 0 , damage);
+        super(x, y, width, height, 0, damage);
         this.speed = speed;
         this.OutOfBoundProjectile = false;
     }
-    
-    public boolean OutOfBoundBullet(){
+
+    public boolean OutOfBoundBullet() {
         return OutOfBoundProjectile;
     }
 
-    public int getSpeed(){
+    public int getSpeed() {
         return speed;
     }
 
@@ -586,7 +663,7 @@ class Projectile extends Object { //Implement projectile here, maybe consider po
         // Update the projectile's position based on its speed and direction
         y -= speed;
         // Check if the projectile is out of bounds and remove it from the game if necessary
-        	if (y < 0 || y > GamePanel.getGameHeight()) {
+        if (y < 0 || y > GamePanel.getGameHeight()) {
             OutOfBoundProjectile = true;
         }
     }
@@ -600,45 +677,49 @@ class Projectile extends Object { //Implement projectile here, maybe consider po
 }
 
 class GamePhysic { //game physic will be in this class: projetile and enemy collision, enemy and player collision, etc.
-    public void GamePhysicUpdate(Player player, java.util.List<Enemy> enemies, java.util.List<Projectile> projectiles){
+
+    public void GamePhysicUpdate(Player player, java.util.List<Enemy> enemies, java.util.List<Projectile> projectiles) {
         PlayerToEnemyCollision(player, enemies);
-        ProjectileCollisionPlayer(player,projectiles);
-        ProjectileCollisionEnemy(player,enemies,projectiles);
+        ProjectileCollisionPlayer(player, projectiles);
+        ProjectileCollisionEnemy(player, enemies, projectiles);
     }
-    private void PlayerToEnemyCollision(Player player, java.util.List<Enemy> enemies){ //This will check collision between player and enemy, if the player hitbox intersect with enemy hitbox the player will take damage
+
+    private void PlayerToEnemyCollision(Player player, java.util.List<Enemy> enemies) { //This will check collision between player and enemy, if the player hitbox intersect with enemy hitbox the player will take damage
         Rectangle playerBounds = player.getBounds(); //Use rectangle to get the hitbox of player
         for (Enemy enemy : enemies) {
-            if (playerBounds.intersects(enemy.getBounds())){ //This one detect if player rectangle intersects with enemy rectangle
+            if (playerBounds.intersects(enemy.getBounds())) { //This one detect if player rectangle intersects with enemy rectangle
                 player.MeLifeIs(player.WhatMeLife() - 10); //If they hit each other it will decreasees player hp by 10
             }
         }
     }
-    private void ProjectileCollisionPlayer(Player player, java.util.List<Projectile> projectiles){
+
+    private void ProjectileCollisionPlayer(Player player, java.util.List<Projectile> projectiles) {
         Rectangle playerBounds = player.getBounds();
         projectiles.removeIf(projectile -> { //this will make the bullet disappears once it hit a player
-           if(projectile.getSpeed() < 0 && playerBounds.intersects(projectile.getBounds())) { //Check collision between player and bullet. projectile.getspeed() < 0 means the bullet is from enemy
-               player.MeLifeIs(player.WhatMeLife() - projectile.getDamage()); //If player rectangle intersects with enemy bullet rectangle, it will decreases player hp depending on enemy damage
-               return true; //remove projectile from list
-           }
-           return false;
+            if (projectile.getSpeed() < 0 && playerBounds.intersects(projectile.getBounds())) { //Check collision between player and bullet. projectile.getspeed() < 0 means the bullet is from enemy
+                player.MeLifeIs(player.WhatMeLife() - projectile.getDamage()); //If player rectangle intersects with enemy bullet rectangle, it will decreases player hp depending on enemy damage
+                return true; //remove projectile from list
+            }
+            return false;
         });
     }
-    private void ProjectileCollisionEnemy(Player player, java.util.List<Enemy> enemies, java.util.List<Projectile> projectiles){
+
+    private void ProjectileCollisionEnemy(Player player, java.util.List<Enemy> enemies, java.util.List<Projectile> projectiles) {
         projectiles.removeIf(projectile -> { //This will make the bullet disappear once it hit an enemy
-           if(projectile.getSpeed() > 0) { //this will check if the bullet comes from player or not (player bullet speed is in positive)
-               Rectangle bulletBounds = projectile.getBounds();
-               for (Enemy enemy : enemies) {
-                   if (bulletBounds.intersects(enemy.getBounds())) { //If projectile rectangle (from player) intersects with enemy rectangle, it will decrease enemy hp proportion to player damage
-                       enemy.MeLifeIs(enemy.WhatMeLife() - projectile.getDamage()); //Decrease enemy hp
-                       if (enemy.WhatMeLife() <= 0) { //If enemy hp is less than or equal to 0 it will delete the enemy
-                           enemies.remove(enemy);
-			   player.IncreaseScore(10); //Increase player score whenever they kills an enemy
-                       }
-                       return true; //remove projectile from list
-                   }
-               }
-           } 
-           return false;
+            if (projectile.getSpeed() > 0) { //this will check if the bullet comes from player or not (player bullet speed is in positive)
+                Rectangle bulletBounds = projectile.getBounds();
+                for (Enemy enemy : enemies) {
+                    if (bulletBounds.intersects(enemy.getBounds())) { //If projectile rectangle (from player) intersects with enemy rectangle, it will decrease enemy hp proportion to player damage
+                        enemy.MeLifeIs(enemy.WhatMeLife() - projectile.getDamage()); //Decrease enemy hp
+                        if (enemy.WhatMeLife() <= 0) { //If enemy hp is less than or equal to 0 it will delete the enemy
+                            enemies.remove(enemy);
+                            player.IncreaseScore(10); //Increase player score whenever they kills an enemy
+                        }
+                        return true; //remove projectile from list
+                    }
+                }
+            }
+            return false;
         });
     }
 }
