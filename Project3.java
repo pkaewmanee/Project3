@@ -371,7 +371,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         int x = (int) (Math.random() * (GAME_WIDTH - 50)); //ramdomly and within the frame
         int y = -50;
         //Enemy enemy = new Enemy(x, y, 80, 90, 200, 30,currentFrame, healthMultiplier);
-        Enemy enemy = new Enemy(x, y, 80, 90, 100, 30, currentFrame, healthMultiplier, damageMultiplier);
+        Enemy enemy = new Enemy(x, y, 80, 90, 100, 15, currentFrame, healthMultiplier, damageMultiplier);
         enemies.add(enemy);
     }
 
@@ -523,7 +523,7 @@ class Player extends Object {
     private String projectileImage = path + "projectile_p.png";
 
     public Player(int x, int y, int width, int height, int speed, GameWindow pf) {
-        super(x, y, width, height, 100, 10);
+        super(x, y, width, height, 200, 25);
         parentFrame = pf;
         this.speed = speed;
         image = new MyImageIcon(playerImage).resize(width, height);
