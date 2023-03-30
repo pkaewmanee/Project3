@@ -1,3 +1,10 @@
+/*
+Possathorn Sujipisut 6480274
+Supakorn Unjindamanee 6480279
+Phakkhapon Kaewmanee 6480929
+Jawit Poopradit      6480087
+*/
+
 package Project3_6480279;
 
 import java.util.*;
@@ -83,6 +90,7 @@ class StartPanel extends JPanel {
                         Supakorn Unjindamanee 6480279
                         Jawit Poopradit       6480087
                         Possathorn Sujipisut 6480274
+			Phakkhapon Kaewmanee 6480929
                                                     """, 
                         "Credits",
                         JOptionPane.INFORMATION_MESSAGE
