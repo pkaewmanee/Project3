@@ -51,7 +51,11 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     /*Add cooldown between bullet*/
     private long lastShotTime;
     private static final int BulletCooldown = 40;
+    private static final int EnemyShotCooldown = 1000;
+    private long lastEnemyShotTime;
+    private GamePhysic gamephysics;
     private GameWindow currentFrame;
+    
     
         //PUN PART
     private int difficulty;
@@ -196,6 +200,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         player = new Player(GAME_WIDTH / 2 - 60, GAME_HEIGHT - 150, 100, 100, PLAYER_SPEED, currentFrame);
         enemies = new ArrayList<>();
         projectiles = new ArrayList<>();
+	gamephysics = new GamePhysic();
     }
 
     public void start() {
@@ -219,6 +224,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
 
         while (isRunning) {
             PlayerInput();
+	    EnemyShoot();
             update();
             repaint();
             try {
@@ -257,6 +263,16 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
             
         }
     }
+	
+    private void EnemyShoot() {
+    long currentTime = System.currentTimeMillis();
+        if (currentTime - lastEnemyShotTime > EnemyShotCooldown) {
+            for (Enemy enemy : enemies) {
+                enemy.shoot(projectiles);
+            }
+            lastEnemyShotTime = currentTime;
+        }
+    }
     
     private void spawnEnemy() {
         int x = (int) (Math.random() * (GAME_WIDTH - 50)); //ramdomly and within the frame
@@ -272,6 +288,11 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         }
         for (Projectile projectile : projectiles) {
             projectile.update();
+        }
+	gamephysics.GamePhysicUpdate(player, enemies, projectiles);
+        
+        if (player.WhatMeLife() <= 0) {  ///THIS IS FOR TESTING FOR WHEN PLAYER HP REACHES 0 IT WILL END PROGRAM, PLEASE CHANGE THIS LATER -Chev
+            stop();
         }
     }
 
@@ -354,11 +375,29 @@ class Object extends JLabel{//parent class for all object in the game: player, e
     
     String path = "src/main/java/Project3_6480279/resources/";
     
-    public Object(int x, int y, int width, int height) {
+    public Object(int x, int y, int width, int height, int health, int damage) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
+	this.health = health;
+        this.damage = damage;
+    }
+
+    public int WhatMeLife() {
+        return health;
+    }
+
+    public void MeLifeIs(int health) {
+        this.health = health;
+    }
+
+    public int getDamage() {
+        return damage;
+    }
+
+    public void setDamage(int damage) {
+        this.damage = damage;
     }
 
     public void update(){ }
@@ -425,7 +464,7 @@ class Player extends Object {
         int projectileSpeed = 10;
         int projectileX = x + width / 2 - projectileWidth / 2;
         int projectileY = y - projectileHeight;
-        projectile.add(new Projectile(projectileX,projectileY,projectileWidth,projectileHeight,projectileSpeed));
+        projectile.add(new Projectile(projectileX,projectileY,projectileWidth,projectileHeight,projectileSpeed, damage));
     }
 
     @Override
@@ -443,7 +482,7 @@ class Enemy extends Object {
     private int verticalspeed;
     private int horizontalspeed;
     private int updateCounter;
-    private int updatesBeforeDirectionChange;
+    private int updatesDirectionChange;
     
     private MyImageIcon image;
     private GameWindow parentFrame;
@@ -453,22 +492,31 @@ class Enemy extends Object {
     public Enemy(int x, int y, int width, int height, GameWindow pf) {
         super(x, y, width, height);
         this.verticalspeed = 1;
-        this.horizontalspeed = generateRandomHorizontalSpeed();
+        this.horizontalspeed = RandomHorizontalSpeed();
         this.updateCounter = 0;
-        this.updatesBeforeDirectionChange = generateRandomUpdatesBeforeDirectionChange();
+        this.updatesDirectionChange = RandomDirectionChange();
         parentFrame = pf;
         image  = new MyImageIcon(enemyImage).resize(width, height);
         setIcon(image);
     }
     
-    private int generateRandomHorizontalSpeed() {
+    private int RandomHorizontalSpeed() {
         return new Random().nextInt(5) - 2;
     }
     
-    private int generateRandomUpdatesBeforeDirectionChange() {
+    private int RandomDirectionChange() {
         return new Random().nextInt(71) + 30;
     }
     
+    public void shoot(java.util.List<Projectile> projectile){
+        int projectileWidth = 3;
+        int projectileHeight = 7;
+        int projectileSpeed = -7;
+        int projectileX = x + width / 2 - projectileWidth / 2;
+        int projectileY = y + height;
+        projectile.add(new Projectile(projectileX,projectileY,projectileWidth,projectileHeight,projectileSpeed, damage));
+    }
+	
     @Override
     public void update() {
         // Update enemy's position, behavior, etc.
@@ -484,9 +532,9 @@ class Enemy extends Object {
         }
         updateCounter++;
         if (updateCounter >= updatesBeforeDirectionChange) {
-            horizontalspeed = generateRandomHorizontalSpeed();
+            horizontalspeed = RandomHorizontalSpeed();
             updateCounter = 0;
-            updatesBeforeDirectionChange = generateRandomUpdatesBeforeDirectionChange();
+            updatesDirectionChange = RandomDirectionChange();
         }
     }
     
@@ -500,10 +548,14 @@ class Enemy extends Object {
 class Projectile extends Object { //Implement projectile here, maybe consider powerboost to change projectile (maybe additional class)
     private int speed;
 
-    public Projectile(int x, int y, int width, int height, int speed) {
-        super(x, y, width, height);
+    public Projectile(int x, int y, int width, int height, int speed, int damage) {
+        super(x, y, width, height, 0 , damage);
         this.speed = speed;
         //Add some bool
+    }
+
+    public int getSpeed(){
+        return speed;
     }
 
     @Override
@@ -522,5 +574,44 @@ class Projectile extends Object { //Implement projectile here, maybe consider po
 }
 
 class GamePhysic { //game physic will be in this class: projetile and enemy collision, enemy and player collision, etc.
-    
+    public void GamePhysicUpdate(Player player, java.util.List<Enemy> enemies, java.util.List<Projectile> projectiles){
+        PlayerToEnemyCollision(player, enemies);
+        ProjectileCollisionPlayer(player,projectiles);
+        ProjectileCollisionEnemy(enemies,projectiles);
+    }
+    private void PlayerToEnemyCollision(Player player, java.util.List<Enemy> enemies){ //This will check collision between player and enemy, if the player hitbox intersect with enemy hitbox the player will take damage
+        Rectangle playerBounds = player.getBounds(); //Use rectangle to get the hitbox of player
+        for (Enemy enemy : enemies) {
+            if (playerBounds.intersects(enemy.getBounds())){ //This one detect if player rectangle intersects with enemy rectangle
+                player.MeLifeIs(player.WhatMeLife() - 10); //If they hit each other it will decreasees player hp by 10
+            }
+        }
+    }
+    private void ProjectileCollisionPlayer(Player player, java.util.List<Projectile> projectiles){
+        Rectangle playerBounds = player.getBounds();
+        projectiles.removeIf(projectile -> {
+           if(projectile.getSpeed() < 0 && playerBounds.intersects(projectile.getBounds())) { //Check collision between player and bullet. projectile.getspeed < 0 means the bullet
+               player.MeLifeIs(player.WhatMeLife() - projectile.getDamage());
+               return true;
+           }
+           return false;
+        });
+    }
+    private void ProjectileCollisionEnemy(java.util.List<Enemy> enemies, java.util.List<Projectile> projectiles){
+        projectiles.removeIf(projectile -> {
+           if(projectile.getSpeed() > 0) {
+               Rectangle bulletBounds = projectile.getBounds();
+               for (Enemy enemy : enemies) {
+                   if (bulletBounds.intersects(enemy.getBounds())) {
+                       enemy.MeLifeIs(enemy.WhatMeLife() - projectile.getDamage());
+                       if (enemy.WhatMeLife() <= 0) {
+                           enemies.remove(enemy);
+                       }
+                       return true;
+                   }
+               }
+           } 
+           return false;
+        });
+    }
 }
