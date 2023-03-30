@@ -641,18 +641,18 @@ class Enemy extends Object {
         y += verticalspeed;
         x += horizontalspeed;
 
-        if (x < 0) {
-            x = 0;
-            horizontalspeed = -horizontalspeed;
-        } else if (x > GamePanel.getGameWidth() - width) {
-            x = GamePanel.getGameWidth() - width;
-            horizontalspeed = -horizontalspeed;
+        if (x < 0) { //check if an enemy go out of bound on the left side
+            x = 0; //if enemy went out of bound on left side, it will set x to 0
+            horizontalspeed = -horizontalspeed; //then reverse the horizontalspeed which make enemy go to opposite direction
+        } else if (x > GamePanel.getGameWidth() - width) { //this one check out of bound on the right side
+            x = GamePanel.getGameWidth() - width; //if out of bound, set x coordinate to edge of game panel
+            horizontalspeed = -horizontalspeed; //reverse horizontalspeed, make enemy go to opposite direction
         }
-        updateCounter++;
-        if (updateCounter >= updatesDirectionChange) {
-            horizontalspeed = RandomHorizontalSpeed();
-            updateCounter = 0;
-            updatesDirectionChange = RandomDirectionChange();
+        updateCounter++; //Increase counter by one in each update()
+        if (updateCounter >= updatesDirectionChange) { //if the counter is >= updatesDirectionChange, this will change enemy direction
+            horizontalspeed = RandomHorizontalSpeed(); //randomize whether the speed is negative (go to the left) or positive (go to the right)
+            updateCounter = 0; //reset counter back to 0
+            updatesDirectionChange = RandomDirectionChange(); //
         }
     }
 
