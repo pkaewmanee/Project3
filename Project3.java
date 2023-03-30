@@ -372,6 +372,8 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
 class Object extends JLabel{//parent class for all object in the game: player, enemy, projectile, etc.
     protected int x, y;
     protected int width, height;
+    protected int health;
+    protected int damage;
     
     String path = "src/main/java/Project3_6480279/resources/";
     
