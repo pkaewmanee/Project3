@@ -3,13 +3,10 @@ package Project3_6480279;
 import java.util.*;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 class GameWindow extends JFrame {
     private StartPanel startPanel;
@@ -48,16 +45,21 @@ class StartPanel extends JPanel {
     private JButton startButton;
     private JComboBox<String> selectDifficulty;
     private JRadioButton[] healthOptions;
+    private JButton creditsButton;
+    private JTextField playerNameField;
     
     public StartPanel(GameWindow gameWindow) {
         this.gameWindow = gameWindow;
+        
+        //Player Name Field
+        playerNameField = new JTextField(15);
         
         // Start Button
         startButton = new JButton("START GAME");
         startButton.addActionListener(e -> gameWindow.startGame());
         
         // Difficulty level selection
-        String[] comboString = {"Easy", "Medium", "Hard", "Very Hard", "Absurdly Impossible"};
+        String[] comboString = {"Easy", "Medium", "Hard", "Extreme", "Mayhem"};
         selectDifficulty = new JComboBox<>(comboString);
         selectDifficulty.setSelectedIndex(1);
         
@@ -70,18 +72,58 @@ class StartPanel extends JPanel {
             healthGroup.add(healthOptions[i]);
         }
         
+        creditsButton = new JButton("CREDITS");
+        creditsButton.addActionListener(new ActionListener (){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                JOptionPane.showMessageDialog(
+                        null, 
+                        """
+                        Game developed by:
+                        Supakorn Unjindamanee 6480279
+                        Jawit Poopradit       6480087
+                        Possathorn Sujipisut 6480274
+                                                    """, 
+                        "Credits",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            }
+        });
+        
         // Layout components
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(10, 10, 10, 10);
+        
+        //Add Player Name
         c.gridx = 0;
         c.gridy = 0;
-        c.insets = new Insets(10, 10, 10, 10);
+        c.anchor = GridBagConstraints.WEST;
+        add(new JLabel("Player Name: "), c);
+        c.gridx = 1;
+        c.anchor = GridBagConstraints.CENTER;
+        add(playerNameField, c);
+        
+        //start button
+        c.gridx = 0;
+        c.gridy = 1;
+        c.gridwidth = 2;
+        c.anchor = GridBagConstraints.CENTER;
+        add(startButton, c);
+        
+        //Select Difficulty
+        c.gridx = 0;
+        c.gridy = 2;
+        c.gridwidth = 1;
+        c.anchor = GridBagConstraints.WEST;
         add(new JLabel("Select Difficulty Level:"), c);
         c.gridx = 1;
         add(selectDifficulty, c);
+        
+        //Select Health Power
         c.gridx = 0;
-        c.gridy = 1;
+        c.gridy = 3;
         add(new JLabel("Select Health Power:"), c);
         c.gridx = 1;
         JPanel healthPanel = new JPanel(new GridLayout(0, 1));
@@ -89,11 +131,13 @@ class StartPanel extends JPanel {
             healthPanel.add(option);
         }
         add(healthPanel, c);
+        
+        //credits button
         c.gridx = 0;
-        c.gridy = 2;
+        c.gridy = 4;
         c.gridwidth = 2;
-        c.anchor = GridBagConstraints.CENTER;
-        add(startButton, c);
+        c.anchor = GridBagConstraints.EAST;
+        add(creditsButton, c);
     }
 }
 
@@ -120,7 +164,6 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     private long lastEnemyShotTime;
     private GamePhysic gamephysics;
     private GameWindow currentFrame;
-    //
 
     public GamePanel(GameWindow currentFrame) {
         this.currentFrame = currentFrame;
@@ -160,7 +203,6 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
             PlayerInput();
 	    EnemyShoot();
             update();
-	    projectiles.removeIf(Projectile::OutOfBoundBullet);
             repaint();
             try {
                 Thread.sleep(16);
@@ -485,19 +527,13 @@ class Enemy extends Object {
 
 class Projectile extends Object { //Implement projectile here, maybe consider powerboost to change projectile (maybe additional class)
     private int speed;
-    private boolean OutOfBoundProjectile;
 
     public Projectile(int x, int y, int width, int height, int speed, int damage) {
         super(x, y, width, height, 0 , damage);
         this.speed = speed;
         //Add some bool
-	this.OutOfBoundProjectile = false;
     }
-    
-    public boolean OutOfBoundBullet(){
-        return OutOfBoundProjectile;
-    }
-	
+
     public int getSpeed(){
         return speed;
     }
@@ -507,9 +543,6 @@ class Projectile extends Object { //Implement projectile here, maybe consider po
         // Update the projectile's position based on its speed and direction
         y -= speed;
         // Check if the projectile is out of bounds and remove it from the game if necessary
-	if (y < 0 || y > GamePanel.getGameHeight()) {
-            OutOfBoundProjectile = true;
-        }
     }
 
     @Override
