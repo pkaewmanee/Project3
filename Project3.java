@@ -591,25 +591,25 @@ class GamePhysic { //game physic will be in this class: projetile and enemy coll
     }
     private void ProjectileCollisionPlayer(Player player, java.util.List<Projectile> projectiles){
         Rectangle playerBounds = player.getBounds();
-        projectiles.removeIf(projectile -> {
-           if(projectile.getSpeed() < 0 && playerBounds.intersects(projectile.getBounds())) { //Check collision between player and bullet. projectile.getspeed < 0 means the bullet
-               player.MeLifeIs(player.WhatMeLife() - projectile.getDamage());
-               return true;
+        projectiles.removeIf(projectile -> { //this will make the bullet disappears once it hit a player
+           if(projectile.getSpeed() < 0 && playerBounds.intersects(projectile.getBounds())) { //Check collision between player and bullet. projectile.getspeed() < 0 means the bullet is from enemy
+               player.MeLifeIs(player.WhatMeLife() - projectile.getDamage()); //If player rectangle intersects with enemy bullet rectangle, it will decreases player hp depending on enemy damage
+               return true; //remove projectile from list
            }
            return false;
         });
     }
     private void ProjectileCollisionEnemy(java.util.List<Enemy> enemies, java.util.List<Projectile> projectiles){
-        projectiles.removeIf(projectile -> {
-           if(projectile.getSpeed() > 0) {
+        projectiles.removeIf(projectile -> { //This will make the bullet disappear once it hit an enemy
+           if(projectile.getSpeed() > 0) { //this will check if the bullet comes from player or not (player bullet speed is in positive)
                Rectangle bulletBounds = projectile.getBounds();
                for (Enemy enemy : enemies) {
-                   if (bulletBounds.intersects(enemy.getBounds())) {
-                       enemy.MeLifeIs(enemy.WhatMeLife() - projectile.getDamage());
-                       if (enemy.WhatMeLife() <= 0) {
+                   if (bulletBounds.intersects(enemy.getBounds())) { //If projectile rectangle (from player) intersects with enemy rectangle, it will decrease enemy hp proportion to player damage
+                       enemy.MeLifeIs(enemy.WhatMeLife() - projectile.getDamage()); //Decrease enemy hp
+                       if (enemy.WhatMeLife() <= 0) { //If enemy hp is less than or equal to 0 it will delete the enemy
                            enemies.remove(enemy);
                        }
-                       return true;
+                       return true; //remove projectile from list
                    }
                }
            } 
