@@ -4,7 +4,7 @@ Jawit Poopradit      6480087
 Phakkhapon Kaewmanee 6480929
 Possathorn Sujipisut 6480274
  */
-package Project3;
+package Project3_6480279;
 
 import java.util.*;
 import javax.swing.*;
@@ -473,7 +473,7 @@ class Object extends JLabel {//parent class for all object in the game: player, 
     protected int health;
     protected int damage;
 
-    String path = "src/main/java/Project3/resources/";
+    String path = "src/main/java/Project3_6480279/resources/";
 
     public Object(int x, int y, int width, int height, int health, int damage) {
         this.x = x;
