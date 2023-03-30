@@ -411,6 +411,10 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
             projectile.update();
         }
         gamephysics.GamePhysicUpdate(player, enemies, projectiles);
+        
+        if (gamephysics.IsGameOver()) { //Once the game is over, it will clear all the existing enemies
+            enemies.clear();
+        }
     }
 
     @Override
@@ -734,11 +738,25 @@ class Projectile extends Object { //Implement projectile here, maybe consider po
 }
 
 class GamePhysic { //game physic will be in this class: projetile and enemy collision, enemy and player collision, etc.
+    
+    private boolean GameOver;
+    
+    public void CheckForGameOver(Player player) {
+        if(player.WhatMeLife() <= 0) {
+            GameOver = true;
+        }
+    }
+    public boolean IsGameOver(){
+        return GameOver;
+    }
 
     public void GamePhysicUpdate(Player player, java.util.List<Enemy> enemies, java.util.List<Projectile> projectiles) {
-        PlayerToEnemyCollision(player, enemies);
-        ProjectileCollisionPlayer(player, projectiles);
-        ProjectileCollisionEnemy(player, enemies, projectiles);
+        CheckForGameOver(player);
+        if(!GameOver) {
+            PlayerToEnemyCollision(player, enemies);
+            ProjectileCollisionPlayer(player, projectiles);
+            ProjectileCollisionEnemy(player, enemies, projectiles);
+        }
     }
 
     private void PlayerToEnemyCollision(Player player, java.util.List<Enemy> enemies) { //This will check collision between player and enemy, if the player hitbox intersect with enemy hitbox the player will take damage
