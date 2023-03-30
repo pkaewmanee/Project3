@@ -1,8 +1,8 @@
 /*
-Possathorn Sujipisut 6480274
 Supakorn Unjindamanee 6480279
-Phakkhapon Kaewmanee 6480929
 Jawit Poopradit      6480087
+Phakkhapon Kaewmanee 6480929
+Possathorn Sujipisut 6480274
  */
 package Project3;
 
@@ -107,9 +107,9 @@ class StartPanel extends JPanel {
                         """
                     Game developed by:
                     Supakorn Unjindamanee 6480279
-                    Jawit Poopradit       6480087
-                    Possathorn Sujipisut 6480274
+                    Jawit Poopradit      6480087
                     Phakkhapon Kaewmanee 6480929
+                    Possathorn Sujipisut 6480274
                                                 """,
                         "Credits",
                         JOptionPane.INFORMATION_MESSAGE
