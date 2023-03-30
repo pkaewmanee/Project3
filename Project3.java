@@ -21,6 +21,7 @@ class GameWindow extends JFrame {
 
     private StartPanel startPanel;
     private GamePanel gamePanel;
+    private MySoundEffect themeSound;
     
     String path = "src/main/java/Project3_6480279/resources/";
 
