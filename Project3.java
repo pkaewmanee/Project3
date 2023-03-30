@@ -256,6 +256,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         this.currentFrame = currentFrame;
         healthMultiplier = startPanel.getHealthPower();
         damageMultiplier = startPanel.getDifficulty();
+        System.out.print(healthMultiplier + " " + damageMultiplier);
         setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
         setBackground(Color.BLACK); // Default background for now, need change!
         setFocusable(true);
@@ -501,8 +502,7 @@ class Player extends Object {
     String playerImage = path + "jet.png";
 
     public Player(int x, int y, int width, int height, int speed, GameWindow pf) {
-        //super(x, y, width, height, 100, 10);
-        super(x, y, width, height, 100, 100);
+        super(x, y, width, height, 100, 10);
         parentFrame = pf;
         this.speed = speed;
         image = new MyImageIcon(playerImage).resize(width, height);
