@@ -64,7 +64,6 @@ class GameWindow extends JFrame {
 }
 
 class StartPanel extends JPanel {
-
     private GameWindow gameWindow;
     private JButton startButton;
     private JComboBox<String> selectDifficulty;
@@ -72,20 +71,31 @@ class StartPanel extends JPanel {
     private JButton creditsButton;
     private JTextField playerNameField;
     private ButtonGroup healthGroup;
+    
+    private Image backgroundImage;
 
     public StartPanel(GameWindow gameWindow) {
         this.gameWindow = gameWindow;
+        
+        try {
+            backgroundImage = ImageIO.read(new File("src/main/java/Project3_6480279/resources/background.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         //Player Name Field
         playerNameField = new JTextField(15);
+        playerNameField.setBackground(Color.LIGHT_GRAY);
 
         // Start Button
         startButton = new JButton("START GAME");
+        startButton.setBackground(Color.LIGHT_GRAY);
         startButton.addActionListener(e -> gameWindow.startGame());
 
         // Difficulty level selection
         String[] comboString = {"Easy", "Medium", "Hard", "Extreme", "Mayhem"};
         selectDifficulty = new JComboBox<>(comboString);
+        selectDifficulty.setBackground(Color.LIGHT_GRAY);
         selectDifficulty.setSelectedIndex(1);
         selectDifficulty.addActionListener(e -> gameWindow.updateDifficulty(getDifficulty()));
 
@@ -100,6 +110,7 @@ class StartPanel extends JPanel {
         }
 
         creditsButton = new JButton("CREDITS");
+        creditsButton.setBackground(Color.LIGHT_GRAY);
         creditsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -128,7 +139,9 @@ class StartPanel extends JPanel {
         c.gridx = 0;
         c.gridy = 0;
         c.anchor = GridBagConstraints.WEST;
-        add(new JLabel("Player Name: "), c);
+        JLabel playerNameLabel = new JLabel("Player Name: ");
+        playerNameLabel.setForeground(Color.WHITE); // set the text color to red
+        add(playerNameLabel, c);
         c.gridx = 1;
         c.anchor = GridBagConstraints.CENTER;
         add(playerNameField, c);
@@ -145,14 +158,18 @@ class StartPanel extends JPanel {
         c.gridy = 2;
         c.gridwidth = 1;
         c.anchor = GridBagConstraints.WEST;
-        add(new JLabel("Select Difficulty Level:"), c);
+        JLabel difficultyQuestion = new JLabel("Select Difficulty Level:");
+        difficultyQuestion.setForeground(Color.WHITE);
+        add(difficultyQuestion, c);
         c.gridx = 1;
         add(selectDifficulty, c);
 
         //Select Health Power
         c.gridx = 0;
         c.gridy = 3;
-        add(new JLabel("Select Health Power:"), c);
+        JLabel healthSelection = new JLabel("Select Health Power:");
+        healthSelection.setForeground(Color.WHITE);
+        add(healthSelection, c);
         c.gridx = 1;
         JPanel healthPanel = new JPanel(new GridLayout(0, 1));
         for (JRadioButton option : healthOptions) {
@@ -166,6 +183,16 @@ class StartPanel extends JPanel {
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
         add(creditsButton, c);
+    }
+    
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        // Draw the background image
+        if (backgroundImage != null) {
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), null);
+        }
     }
 
     public void setPlayerName(String name) {
