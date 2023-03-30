@@ -652,7 +652,7 @@ class Enemy extends Object {
         if (updateCounter >= updatesDirectionChange) { //if the counter is >= updatesDirectionChange, this will change enemy direction
             horizontalspeed = RandomHorizontalSpeed(); //randomize whether the speed is negative (go to the left) or positive (go to the right)
             updateCounter = 0; //reset counter back to 0
-            updatesDirectionChange = RandomDirectionChange(); //
+            updatesDirectionChange = RandomDirectionChange(); //Randomize updatesDirectionChange to number between 30-100, this prevent enemy from having fix directional change time interval (Basically make sure enemy doesn't changes direction every x seconds but changes direction every random seconds)
         }
     }
 
