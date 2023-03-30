@@ -147,9 +147,18 @@ class StartPanel extends JPanel {
         c.anchor = GridBagConstraints.EAST;
         add(creditsButton, c);
     }
+    public int getSelectedHealthMultiplier() {
+    for (int i = 0; i < healthOptions.length; i++) {
+        if (healthOptions[i].isSelected()) {
+            return 1 << i;
+        }
+    }
+    return 1;
+    }
 }
 
 class GamePanel extends JPanel implements Runnable, KeyListener {
+    private StartPanel startPanel;
     private static final int GAME_WIDTH = 600;
     private static final int GAME_HEIGHT = 800;
     private static final int PLAYER_SPEED = 7;
@@ -159,6 +168,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     private java.util.List<Enemy> enemies;
     private java.util.List<Projectile> projectiles;
     private long lastEnemySpawnTime;
+    private int healthMultiplier;
     /*Boolean variable to keeps track if the button is pressed so that the character can do both action at the same time*/
     private boolean moveleft;
     private boolean moveright;
@@ -174,6 +184,8 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     private GameWindow currentFrame;
 
     public GamePanel(GameWindow currentFrame) {
+	this.startPanel = new StartPanel(currentFrame);
+        this.healthMultiplier = startPanel.getSelectedHealthMultiplier();
         this.currentFrame = currentFrame;
         setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
         setBackground(Color.BLACK); // Default background for now, need change!
@@ -270,7 +282,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     private void spawnEnemy() {
         int x = (int) (Math.random() * (GAME_WIDTH - 50)); //ramdomly and within the frame
         int y = -50;
-        Enemy enemy = new Enemy(x, y, 80, 90, currentFrame);
+        Enemy enemy = new Enemy(x, y, 80, 90, 200, 30,currentFrame, healthMultiplier);
         enemies.add(enemy);
     }
 
@@ -464,11 +476,11 @@ class Player extends Object {
         projectile.add(new Projectile(projectileX,projectileY,projectileWidth,projectileHeight,projectileSpeed, damage));
     }
 
-    public void IncreaseScore(int points) { //NEW
+    public void IncreaseScore(int points) {
         score += points;
     }
     
-    public int getScore() { //NEW
+    public int getScore() {
         return score;
     }
 	
@@ -495,8 +507,8 @@ class Enemy extends Object {
     
     String enemyImage = path + "enemy.png";
 
-    public Enemy(int x, int y, int width, int height, GameWindow pf) {
-        super(x, y, width, height, 100, 50);
+    public Enemy(int x, int y, int width, int height, int health, int damage, GameWindow pf, int healthMultiplier) {
+        super(x, y, width, height, health * healthMultiplier, damage);
         this.verticalspeed = 1;
         this.horizontalspeed = RandomHorizontalSpeed();
         this.updateCounter = 0;
