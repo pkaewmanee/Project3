@@ -596,11 +596,11 @@ class Enemy extends Object {
     }
 
     private int RandomHorizontalSpeed() {
-        return new Random().nextInt(5) - 2; //It will random number between -2 to 2 which is the speed of enemy going left or right
+        return new Random().nextInt(5) - 2; //It will random number between -2 and 2, which is the speed of enemy going left or right
     }
 
     private int RandomDirectionChange() {
-        return new Random().nextInt(71) + 30; 
+        return new Random().nextInt(71) + 30; //This will random number between 30 and 100, which determines how often the enemy changes direction.
     }
 
     public void shoot(java.util.List<Projectile> projectile) {
