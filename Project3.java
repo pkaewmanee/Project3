@@ -507,6 +507,9 @@ class Projectile extends Object { //Implement projectile here, maybe consider po
         // Update the projectile's position based on its speed and direction
         y -= speed;
         // Check if the projectile is out of bounds and remove it from the game if necessary
+	if (y < 0 || y > GamePanel.getGameHeight()) {
+            OutOfBoundProjectile = true;
+        }
     }
 
     @Override
