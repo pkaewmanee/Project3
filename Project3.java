@@ -160,6 +160,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
             PlayerInput();
 	    EnemyShoot();
             update();
+	    projectiles.removeIf(Projectile::OutOfBoundBullet);
             repaint();
             try {
                 Thread.sleep(16);
@@ -484,13 +485,19 @@ class Enemy extends Object {
 
 class Projectile extends Object { //Implement projectile here, maybe consider powerboost to change projectile (maybe additional class)
     private int speed;
+    private boolean OutOfBoundProjectile;
 
     public Projectile(int x, int y, int width, int height, int speed, int damage) {
         super(x, y, width, height, 0 , damage);
         this.speed = speed;
         //Add some bool
+	this.OutOfBoundProjectile = false;
     }
-
+    
+    public boolean OutOfBoundBullet(){
+        return OutOfBoundProjectile;
+    }
+	
     public int getSpeed(){
         return speed;
     }
