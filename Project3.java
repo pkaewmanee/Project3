@@ -1,3 +1,9 @@
+/*
+Supakorn Unjindamanee 6480279
+Jawit Poopradit      6480087
+Phakkhapon Kaewmanee 6480929
+Possathorn Sujipisut 6480274
+ */
 package Project3_6480279;
 
 import java.util.*;
@@ -7,6 +13,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import javax.imageio.ImageIO;
 import java.io.IOException;
@@ -16,7 +24,7 @@ class MainApplication extends JFrame {
     private StartPanel startPanel;
     private GamePanel gamePanel;
     private MySoundEffect themeSound;
-    
+
     String path = "src/main/java/Project3_6480279/resources/";
 
     public MainApplication() {
@@ -27,7 +35,8 @@ class MainApplication extends JFrame {
         setLocationRelativeTo(null);
 
         themeSound = new MySoundEffect(path + "theme.wav");
-        themeSound.playLoop(); themeSound.setVolume(0.4f);
+        themeSound.playLoop();
+        themeSound.setVolume(0.4f);
         startPanel = new StartPanel(this);
         gamePanel = new GamePanel(this);
         add(startPanel);
@@ -58,6 +67,7 @@ class MainApplication extends JFrame {
 }
 
 class StartPanel extends JPanel {
+
     private MainApplication gameWindow;
     private JButton startButton;
     private JComboBox<String> selectDifficulty;
@@ -66,12 +76,12 @@ class StartPanel extends JPanel {
     private JButton howToPlayButton;
     private JTextField playerNameField;
     private ButtonGroup healthGroup;
-    
+
     private Image backgroundImage;
 
     public StartPanel(MainApplication gameWindow) {
         this.gameWindow = gameWindow;
-        
+
         try {
             backgroundImage = ImageIO.read(new File("src/main/java/Project3_6480279/resources/background.png"));
         } catch (IOException e) {
@@ -123,12 +133,12 @@ class StartPanel extends JPanel {
                 );
             }
         });
-        
+
         howToPlayButton = new JButton("HOW TO PLAY");
         howToPlayButton.setBackground(Color.LIGHT_GRAY);
         howToPlayButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e){
+            public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(
                         null,
                         """
@@ -147,10 +157,9 @@ class StartPanel extends JPanel {
                         """,
                         "How to play",
                         JOptionPane.INFORMATION_MESSAGE
-                
                 );
             }
-        });    
+        });
 
         // Layout components
         setLayout(new GridBagLayout());
@@ -206,14 +215,14 @@ class StartPanel extends JPanel {
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
         add(creditsButton, c);
-        
+
         c.gridx = 0;
         c.gridy = 5;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
         add(howToPlayButton, c);
     }
-    
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -279,7 +288,7 @@ class StartPanel extends JPanel {
 
 }
 
-class GamePanel extends JPanel implements Runnable, KeyListener {
+class GamePanel extends JPanel implements Runnable, KeyListener, MouseListener {
 
     private StartPanel startPanel;
     private static final int GAME_WIDTH = 600;
@@ -306,7 +315,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     private long lastEnemyShotTime;
     private GamePhysic gamephysics;
     private MainApplication currentFrame;
-    
+
     private Image background;
 
     public void updateDifficulty(int difficulty) {
@@ -324,21 +333,22 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         damageMultiplier = startPanel.getDifficulty();
         System.out.print(healthMultiplier + " " + damageMultiplier);
         setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
-        
+
         setLayout(null);
         try {
             background = ImageIO.read(new File("src/main/java/Project3_6480279/resources/background.png"));
         } catch (IOException e) {
             System.err.println(e);
         }
-       
+
         player = new Player(GAME_WIDTH / 2 - 60, GAME_HEIGHT - 150, 30, 30, PLAYER_SPEED, currentFrame);
         enemies = new ArrayList<>();
         projectiles = new ArrayList<>();
         gamephysics = new GamePhysic();
-        
+
         setFocusable(true);
         addKeyListener(this);
+        addMouseListener(this);
     }
 
     public void VictoryRoyal(Graphics g) {
@@ -439,7 +449,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
             projectile.update();
         }
         gamephysics.GamePhysicUpdate(player, enemies, projectiles);
-        
+
         if (gamephysics.IsGameOver()) { //Once the game is over, it will clear all the existing enemies
             enemies.clear();
         }
@@ -464,6 +474,33 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     }
 
     @Override
+    public void mousePressed(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            shoot = true;
+        }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            shoot = false;
+        }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
+
+    @Override
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
 
@@ -480,9 +517,9 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
             case KeyEvent.VK_DOWN:
                 movedown = true;
                 break;
-            case KeyEvent.VK_Z:
+            /*case KeyEvent.VK_Z:
                 shoot = true;
-                break;
+                break;*/
             default:
                 break;
         }
@@ -504,9 +541,9 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
             case KeyEvent.VK_DOWN:
                 movedown = false;
                 break;
-            case KeyEvent.VK_Z:
+            /*case KeyEvent.VK_Z:
                 shoot = false;
-                break;
+                break;*/
             default:
                 break;
         }
@@ -578,7 +615,7 @@ class Player extends Object {
     private int score = 0;
 
     String playerImage = path + "jet.png";
-    
+
     private String projectileImage = path + "projectile_p.png";
 
     public Player(int x, int y, int width, int height, int speed, MainApplication pf) {
@@ -663,7 +700,7 @@ class Enemy extends Object {
     private MainApplication parentFrame;
 
     String enemyImage = path + "enemy.png";
-    
+
     private String projectileImage = path + "projectile_e.png";
 
     public Enemy(int x, int y, int width, int height, int health, int damage, MainApplication pf, int healthMultiplier, int damageMultiplier) {
@@ -733,10 +770,10 @@ class Projectile extends Object { //Implement projectile here, maybe consider po
         super(x, y, width, height, 0, damage);
         this.speed = speed;
         this.OutOfBoundProjectile = false;
-        
+
         this.imagePath = imagePath;
         this.parentFrame = parentFrame;
-        
+
         image = new MyImageIcon(imagePath).resize(width, height);
         setIcon(image);
     }
@@ -766,21 +803,22 @@ class Projectile extends Object { //Implement projectile here, maybe consider po
 }
 
 class GamePhysic { //game physic will be in this class: projetile and enemy collision, enemy and player collision, etc.
-    
+
     private boolean GameOver;
-    
+
     public void CheckForGameOver(Player player) {
-        if(player.WhatMeLife() <= 0) {
+        if (player.WhatMeLife() <= 0) {
             GameOver = true;
         }
     }
-    public boolean IsGameOver(){
+
+    public boolean IsGameOver() {
         return GameOver;
     }
 
     public void GamePhysicUpdate(Player player, java.util.List<Enemy> enemies, java.util.List<Projectile> projectiles) {
         CheckForGameOver(player);
-        if(!GameOver) {
+        if (!GameOver) {
             PlayerToEnemyCollision(player, enemies);
             ProjectileCollisionPlayer(player, projectiles);
             ProjectileCollisionEnemy(player, enemies, projectiles);
