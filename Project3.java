@@ -153,6 +153,8 @@ class StartPanel extends JPanel {
                         The game will run forever until you die. 
                         Your score will be pop-up after after GAME OVER!
                         
+                        Turn on your volume for more fun!
+                        
                         ENJOY THE GAME!
                         """,
                         "How to play",
