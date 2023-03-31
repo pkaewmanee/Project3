@@ -147,7 +147,7 @@ class StartPanel extends JPanel {
                         The enemy health will be an option to pick.
                         
                         How To Play The Game:
-                        Use arrow keys to move your character. You can go anywhere within the frame.
+                        Use WASD keys to move your character. You can go anywhere within the frame.
                         Use left mouse click to shoot. Hold down for rapid firing or press to shoot from time to time.
                         
                         The game will run forever until you die. 
@@ -508,16 +508,16 @@ class GamePanel extends JPanel implements Runnable, KeyListener, MouseListener {
         int keyCode = e.getKeyCode();
 
         switch (keyCode) {
-            case KeyEvent.VK_LEFT:
+            case KeyEvent.VK_A:
                 moveleft = true;
                 break;
-            case KeyEvent.VK_RIGHT:
+            case KeyEvent.VK_D:
                 moveright = true;
                 break;
-            case KeyEvent.VK_UP:
+            case KeyEvent.VK_W:
                 moveup = true;
                 break;
-            case KeyEvent.VK_DOWN:
+            case KeyEvent.VK_S:
                 movedown = true;
                 break;
             /*case KeyEvent.VK_Z:
@@ -532,16 +532,16 @@ class GamePanel extends JPanel implements Runnable, KeyListener, MouseListener {
     public void keyReleased(KeyEvent e) {
         int keyCode = e.getKeyCode();
         switch (keyCode) {
-            case KeyEvent.VK_LEFT:
+            case KeyEvent.VK_A:
                 moveleft = false;
                 break;
-            case KeyEvent.VK_RIGHT:
+            case KeyEvent.VK_D:
                 moveright = false;
                 break;
-            case KeyEvent.VK_UP:
+            case KeyEvent.VK_W:
                 moveup = false;
                 break;
-            case KeyEvent.VK_DOWN:
+            case KeyEvent.VK_S:
                 movedown = false;
                 break;
             /*case KeyEvent.VK_Z:
