@@ -1,9 +1,3 @@
-/*
-Supakorn Unjindamanee 6480279
-Jawit Poopradit      6480087
-Phakkhapon Kaewmanee 6480929
-Possathorn Sujipisut 6480274
- */
 package Project3_6480279;
 
 import java.util.*;
@@ -17,7 +11,7 @@ import java.io.File;
 import javax.imageio.ImageIO;
 import java.io.IOException;
 
-class GameWindow extends JFrame {
+class MainApplication extends JFrame {
 
     private StartPanel startPanel;
     private GamePanel gamePanel;
@@ -25,7 +19,7 @@ class GameWindow extends JFrame {
     
     String path = "src/main/java/Project3_6480279/resources/";
 
-    public GameWindow() {
+    public MainApplication() {
         setTitle("Journey To The Stars");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(600, 800);
@@ -57,24 +51,25 @@ class GameWindow extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            GameWindow gameWindow = new GameWindow();
+            MainApplication gameWindow = new MainApplication();
             gameWindow.setVisible(true);
         });
     }
 }
 
 class StartPanel extends JPanel {
-    private GameWindow gameWindow;
+    private MainApplication gameWindow;
     private JButton startButton;
     private JComboBox<String> selectDifficulty;
     private JRadioButton[] healthOptions;
     private JButton creditsButton;
+    private JButton howToPlayButton;
     private JTextField playerNameField;
     private ButtonGroup healthGroup;
     
     private Image backgroundImage;
 
-    public StartPanel(GameWindow gameWindow) {
+    public StartPanel(MainApplication gameWindow) {
         this.gameWindow = gameWindow;
         
         try {
@@ -128,6 +123,34 @@ class StartPanel extends JPanel {
                 );
             }
         });
+        
+        howToPlayButton = new JButton("HOW TO PLAY");
+        howToPlayButton.setBackground(Color.LIGHT_GRAY);
+        howToPlayButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e){
+                JOptionPane.showMessageDialog(
+                        null,
+                        """
+                        Make Sure to set the desired difficulty and enemy health level before start the game.
+                        The difficulty selection will be a drop-down box.
+                        The enemy health will be an option to pick.
+                        
+                        How To Play The Game:
+                        Use arrow keys to move your character. You can go anywhere within the frame.
+                        Use z key to shoot. Hold down for rapid firing or press to shoot from time to time
+                        
+                        The game will run forever until you die. 
+                        Your score will be pop-up after after GAME OVER!
+                        
+                        ENJOY THE GAME!
+                        """,
+                        "How to play",
+                        JOptionPane.INFORMATION_MESSAGE
+                
+                );
+            }
+        });    
 
         // Layout components
         setLayout(new GridBagLayout());
@@ -183,6 +206,12 @@ class StartPanel extends JPanel {
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
         add(creditsButton, c);
+        
+        c.gridx = 0;
+        c.gridy = 5;
+        c.gridwidth = 2;
+        c.anchor = GridBagConstraints.EAST;
+        add(howToPlayButton, c);
     }
     
     @Override
@@ -276,7 +305,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     private static final int EnemyShotCooldown = 1000;
     private long lastEnemyShotTime;
     private GamePhysic gamephysics;
-    private GameWindow currentFrame;
+    private MainApplication currentFrame;
     
     private Image background;
 
@@ -288,7 +317,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         this.healthMultiplier = power;
     }
 
-    public GamePanel(GameWindow currentFrame) {
+    public GamePanel(MainApplication currentFrame) {
         this.startPanel = new StartPanel(currentFrame);
         this.currentFrame = currentFrame;
         healthMultiplier = startPanel.getHealthPower();
@@ -339,7 +368,6 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
 
     @Override
     public void run() {
-
         lastEnemySpawnTime = System.currentTimeMillis();
 
         while (isRunning) {
@@ -546,14 +574,14 @@ class Player extends Object {
 
     private int speed;
     private MyImageIcon image;
-    private GameWindow parentFrame;
+    private MainApplication parentFrame;
     private int score = 0;
 
     String playerImage = path + "jet.png";
     
     private String projectileImage = path + "projectile_p.png";
 
-    public Player(int x, int y, int width, int height, int speed, GameWindow pf) {
+    public Player(int x, int y, int width, int height, int speed, MainApplication pf) {
         super(x, y, width, height, 200, 25);
         parentFrame = pf;
         this.speed = speed;
@@ -632,13 +660,13 @@ class Enemy extends Object {
     private int updatesDirectionChange;
 
     private MyImageIcon image;
-    private GameWindow parentFrame;
+    private MainApplication parentFrame;
 
     String enemyImage = path + "enemy.png";
     
     private String projectileImage = path + "projectile_e.png";
 
-    public Enemy(int x, int y, int width, int height, int health, int damage, GameWindow pf, int healthMultiplier, int damageMultiplier) {
+    public Enemy(int x, int y, int width, int height, int health, int damage, MainApplication pf, int healthMultiplier, int damageMultiplier) {
         super(x, y, width, height, health * healthMultiplier, damage * damageMultiplier);
         this.verticalspeed = 1;
         this.horizontalspeed = RandomHorizontalSpeed();
@@ -699,9 +727,9 @@ class Projectile extends Object { //Implement projectile here, maybe consider po
     private boolean OutOfBoundProjectile;
     private String imagePath;
     private MyImageIcon image;
-    private GameWindow parentFrame;
+    private MainApplication parentFrame;
 
-    public Projectile(int x, int y, int width, int height, int speed, int damage, String imagePath, GameWindow parentFrame) {
+    public Projectile(int x, int y, int width, int height, int speed, int damage, String imagePath, MainApplication parentFrame) {
         super(x, y, width, height, 0, damage);
         this.speed = speed;
         this.OutOfBoundProjectile = false;
