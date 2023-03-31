@@ -148,7 +148,7 @@ class StartPanel extends JPanel {
                         
                         How To Play The Game:
                         Use arrow keys to move your character. You can go anywhere within the frame.
-                        Use z key to shoot. Hold down for rapid firing or press to shoot from time to time
+                        Use left mouse click to shoot. Hold down for rapid firing or press to shoot from time to time.
                         
                         The game will run forever until you die. 
                         Your score will be pop-up after after GAME OVER!
@@ -209,18 +209,19 @@ class StartPanel extends JPanel {
         }
         add(healthPanel, c);
 
-        //credits button
+        //How to play button
         c.gridx = 0;
         c.gridy = 4;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
-        add(creditsButton, c);
+        add(howToPlayButton, c);
 
+        //credits button
         c.gridx = 0;
         c.gridy = 5;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
-        add(howToPlayButton, c);
+        add(creditsButton, c);
     }
 
     @Override
