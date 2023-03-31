@@ -667,7 +667,7 @@ class Player extends Object {
         int projectileWidth = 10;
         int projectileHeight = 15;
         int projectileSpeed = 10;
-        int projectileX = x + width / 2 - projectileWidth / 2;
+        int projectileX = x + width - projectileWidth;
         int projectileY = y - projectileHeight;
         projectile.add(new Projectile(projectileX, projectileY, projectileWidth, projectileHeight, projectileSpeed, damage, projectileImage, parentFrame));
     }
